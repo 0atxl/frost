@@ -30,6 +30,7 @@ import {
   Eye,
   LayoutGrid,
   List,
+  Star,
 } from "lucide-react";
 import type { FileEntry } from "../../shared/types";
 import { thumbnailUrl } from "@/lib/api";
@@ -47,6 +48,7 @@ export type FileAction =
   | "cut"
   | "move"
   | "copy-path"
+  | "pin"
   | "new-tab"
   | "external"
   | "open-with"
@@ -63,6 +65,7 @@ const actions: {
     label: "Open folder in new tab",
     icon: SquareArrowOutUpRight,
   },
+  { id: "pin", label: "Pin folder", icon: Star },
   { id: "external", label: "Open in default app", icon: ExternalLink },
   { id: "open-with", label: "Open with…", icon: ExternalLink },
   { id: "preview", label: "Quick look", icon: ScanEye, shortcut: "Space" },
@@ -76,7 +79,7 @@ const actions: {
 ];
 export function fileActionsFor(file: FileEntry | undefined, count: number) {
   return actions.filter((action) =>
-    action.id === "open" || action.id === "new-tab"
+    action.id === "open" || action.id === "new-tab" || action.id === "pin"
       ? count === 1 && file?.kind === "folder"
       : action.id === "preview" ||
           action.id === "external" ||
@@ -158,6 +161,9 @@ interface Props {
   previewOpen: boolean;
   readOnly: boolean;
   onSelectMany: (paths: Set<string>) => void;
+  isPinned: (path: string) => boolean;
+  currentPath: string;
+  onPinCurrent: () => void;
 }
 export function FileBrowser({
   files,
@@ -185,6 +191,9 @@ export function FileBrowser({
   previewOpen,
   readOnly,
   onSelectMany,
+  isPinned,
+  currentPath,
+  onPinCurrent,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(800);
@@ -673,7 +682,11 @@ export function FileBrowser({
                     onSelect={() => onAction(id, contextFiles)}
                   >
                     <Icon size={15} />
-                    <span>{label}</span>
+                    <span>
+                      {id === "pin" && isPinned(contextFiles[0].path)
+                        ? "Unpin folder"
+                        : label}
+                    </span>
                     {shortcut && <span className="menu-key">{shortcut}</span>}
                   </Context.Item>
                 ),
@@ -696,6 +709,16 @@ export function FileBrowser({
                 <Clipboard size={15} />
                 <span>Paste</span>
                 <span className="menu-key">Ctrl V</span>
+              </Context.Item>
+              <Context.Item
+                className="menu-item"
+                onSelect={onPinCurrent}
+                disabled={loading}
+              >
+                <Star size={15} />
+                <span>
+                  {isPinned(currentPath) ? "Unpin folder" : "Pin folder"}
+                </span>
               </Context.Item>
               <Context.Separator className="menu-separator" />
               <Context.Item

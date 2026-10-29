@@ -1987,11 +1987,11 @@
   }
   .find-dialog {
     --find-top: min(18dvh, 160px);
-    width: min(620px, calc(100vw - 32px));
+    width: min(460px, calc(100vw - 32px));
     top: var(--find-top);
     transform: translateX(-50%);
     padding: 0;
-    border-radius: 12px;
+    border-radius: 8px;
     max-height: calc(100dvh - var(--find-top) - 16px);
     display: flex;
     flex-direction: column;
@@ -2006,9 +2006,9 @@
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: 12px;
-    height: 60px;
-    padding: 0 18px;
+    gap: 8px;
+    height: 42px;
+    padding: 0 12px;
     border-bottom: 1px solid var(--line);
   }
   .find-input > svg {
@@ -2023,9 +2023,9 @@
     background: none;
     outline: none;
     box-shadow: none;
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: inherit;
   }
   .find-input input::placeholder {
     color: var(--muted);
@@ -2059,16 +2059,30 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 10px 12px 6px;
+    gap: 8px;
+    padding: 7px 12px;
   }
-  .find-options .view-switch button {
-    width: auto;
-    padding: 0 10px;
-    font-size: 12px;
+  .find-mode {
+    display: flex;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+  .find-mode button {
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .find-mode button[aria-pressed="true"] {
+    background: var(--selected);
+    color: var(--text);
+  }
+  .find-mode button:hover {
+    color: var(--text);
   }
   .find-options label {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 6px;
     font-size: 12px;
@@ -2082,7 +2096,8 @@
     flex-shrink: 0;
     align-items: center;
     gap: 6px;
-    padding: 2px 17px 12px;
+    min-width: 0;
+    flex: 1;
     color: var(--muted);
     font-size: 11px;
   }
@@ -2093,7 +2108,7 @@
   }
   .find-results {
     min-height: 0;
-    max-height: min(360px, 48dvh);
+    max-height: min(280px, 45dvh);
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: 0 6px;
@@ -2108,8 +2123,8 @@
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    padding: 9px 11px;
-    gap: 10px;
+    padding: 6px 8px;
+    gap: 8px;
     border-radius: 6px;
     margin-bottom: 2px;
   }
@@ -2135,8 +2150,13 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-    overflow-wrap: anywhere;
-    font-weight: 500;
+    font-weight: 400;
+    min-width: 0;
+  }
+  .find-result-title > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .find-result-title small {
     white-space: nowrap;
@@ -2162,7 +2182,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 20px 16px;
+    padding: 14px 12px;
     color: var(--muted);
     font-size: 12px;
     border-top: 1px solid var(--line);
@@ -2173,22 +2193,15 @@
     gap: 4px;
     font-size: 11px;
     color: var(--muted);
-    padding: 8px 16px;
+    padding: 5px 12px;
     border-top: 1px solid var(--line);
   }
-  .find-status-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .find-keys {
-    display: flex;
+  .find-partial {
+    display: inline-flex;
     align-items: center;
     gap: 5px;
-  }
-  .find-keys svg:nth-of-type(2) {
-    margin-left: 8px;
+    width: fit-content;
+    border-radius: 3px;
   }
   .matched-line {
     display: inline-block;

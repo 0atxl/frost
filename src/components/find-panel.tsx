@@ -1,14 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowUpDown,
-  CornerDownLeft,
-  Folder,
-  LoaderCircle,
-  Search,
-  Square,
-} from "lucide-react";
+import { Folder, Info, LoaderCircle, Search, Square } from "lucide-react";
 import type { FindResponse, FindResult } from "../../shared/types";
 import { api } from "@/lib/api";
+import { shortenPath } from "@/lib/utils";
+import { Tip } from "./ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -19,11 +14,13 @@ import { FileIcon } from "./file-icon";
 
 export function FindPanel({
   path,
+  home,
   hidden,
   onClose,
   onOpen,
 }: {
   path: string;
+  home: string;
   hidden: boolean;
   onClose: () => void;
   onOpen: (result: FindResult) => void;
@@ -94,7 +91,7 @@ export function FindPanel({
           result and Enter to open it.
         </DialogDescription>
         <div className="find-input">
-          <Search size={20} strokeWidth={1.6} />
+          <Search size={16} strokeWidth={1.6} />
           <input
             type="search"
             autoFocus
@@ -135,6 +132,20 @@ export function FindPanel({
               }
             }}
           />
+          <div className="find-mode" aria-label="Search mode">
+            <button
+              aria-pressed={mode === "names"}
+              onClick={() => setMode("names")}
+            >
+              Names
+            </button>
+            <button
+              aria-pressed={mode === "contents"}
+              onClick={() => setMode("contents")}
+            >
+              Contents
+            </button>
+          </div>
           {busy && (
             <button
               className="find-cancel"
@@ -158,19 +169,13 @@ export function FindPanel({
           </button>
         </div>
         <div className="find-options">
-          <div className="view-switch" aria-label="Search mode">
-            <button
-              aria-pressed={mode === "names"}
-              onClick={() => setMode("names")}
-            >
-              Names
-            </button>
-            <button
-              aria-pressed={mode === "contents"}
-              onClick={() => setMode("contents")}
-            >
-              Contents
-            </button>
+          <div
+            className="find-scope"
+            title={path}
+            aria-label={`Search in ${path}`}
+          >
+            <Folder size={12} />
+            <span>{shortenPath(path, home)}</span>
           </div>
           <label>
             <input
@@ -178,12 +183,8 @@ export function FindPanel({
               checked={recursive}
               onChange={(event) => setRecursive(event.target.checked)}
             />
-            Include subfolders
+            Subfolders
           </label>
-        </div>
-        <div className="find-scope" title={path}>
-          <Folder size={12} />
-          <span>{path}</span>
         </div>
         <div
           className="find-results"
@@ -206,15 +207,20 @@ export function FindPanel({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onOpen(item)}
             >
-              <FileIcon kind={item.file.kind} size={20} />
+              <FileIcon kind={item.file.kind} size={16} />
               <span className="find-result-text">
                 <span className="find-result-title">
-                  {item.file.name}
+                  <span title={item.file.name}>{item.file.name}</span>
                   {item.line && <small>Line {item.line}</small>}
                 </span>
-                <span className="find-result-path" title={item.relativePath}>
-                  {item.relativePath}
-                </span>
+                {item.relativePath.includes("/") && (
+                  <span className="find-result-path" title={item.relativePath}>
+                    {item.relativePath.slice(
+                      0,
+                      item.relativePath.lastIndexOf("/"),
+                    )}
+                  </span>
+                )}
                 {item.snippet && (
                   <span className="find-snippet">{item.snippet}</span>
                 )}
@@ -235,30 +241,33 @@ export function FindPanel({
           </p>
         )}
         {data && (
-          <footer className="find-status">
-            <div className="find-status-row">
-              <span role="status">
-                {items.length} {items.length === 1 ? "match" : "matches"}
+          <span className="sr-only" role="status">
+            {items.length} matches
+          </span>
+        )}
+        {data && (data.limited || data.skipped > 0) && (
+          <div className="find-status">
+            <Tip
+              label={[
+                data.limited
+                  ? "The search reached its time, scan, or result limit. Narrow the scope to see more."
+                  : "",
+                data.skipped
+                  ? `${data.skipped} files or folders could not be fully searched.`
+                  : "",
+                mode === "contents"
+                  ? "Contents search reads up to 256 KB and returns up to five lines per file."
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <span tabIndex={0} className="find-partial">
+                <Info size={12} />
+                Partial results
               </span>
-              {!!items.length && (
-                <span className="find-keys" aria-hidden="true">
-                  <ArrowUpDown size={12} />
-                  Select
-                  <CornerDownLeft size={12} />
-                  Open
-                </span>
-              )}
-            </div>
-            {data.limited && <span>Partial results. Narrow the search.</span>}
-            {!!data.skipped && (
-              <span>
-                {data.skipped} files or folders skipped or partly read
-              </span>
-            )}
-            {mode === "contents" && (
-              <span>Text files · first 256 KB · up to 5 lines per file</span>
-            )}
-          </footer>
+            </Tip>
+          </div>
         )}
       </DialogContent>
     </Dialog>

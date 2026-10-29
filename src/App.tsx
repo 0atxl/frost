@@ -420,20 +420,23 @@ export function App({
     [clipboard],
   );
   const pinned = pins.some((pin) => pin.path === currentPath);
-  function togglePin() {
-    if (!listing) return;
+  function toggleFolderPin(folderPath: string) {
+    const wasPinned = pins.some((pin) => pin.path === folderPath);
     setPins((old) =>
-      pinned
-        ? old.filter((pin) => pin.path !== currentPath)
+      old.some((pin) => pin.path === folderPath)
+        ? old.filter((pin) => pin.path !== folderPath)
         : [
             ...old,
             {
-              name: currentPath.split("/").pop() || "Files",
-              path: currentPath,
+              name: folderPath.split("/").filter(Boolean).pop() || "Filesystem",
+              path: folderPath,
             },
           ],
     );
-    toast(pinned ? "Folder unpinned" : "Folder pinned");
+    toast(wasPinned ? "Folder unpinned" : "Folder pinned");
+  }
+  function togglePin() {
+    if (listing) toggleFolderPin(currentPath);
   }
   function select(
     file: FileEntry,
@@ -506,6 +509,7 @@ export function App({
   function handleAction(action: FileAction, files = selectedFiles) {
     if (!files.length || busy || fileActionDisabled(action, files)) return;
     const file = files[0];
+    if (action === "pin") toggleFolderPin(file.path);
     if (action === "open") go(file.path);
     if (action === "preview") {
       setFindLine(null);
@@ -1448,7 +1452,15 @@ export function App({
                                 onSelect={() => handleAction(id)}
                               >
                                 <Icon size={15} />
-                                <span>{label}</span>
+                                <span>
+                                  {id === "pin" &&
+                                  pins.some(
+                                    (pin) =>
+                                      pin.path === selectedFiles[0]?.path,
+                                  )
+                                    ? "Unpin folder"
+                                    : label}
+                                </span>
                                 {shortcut && (
                                   <span className="menu-key">{shortcut}</span>
                                 )}
@@ -1709,6 +1721,11 @@ export function App({
                     onClearFilter={() => setQuery("")}
                     onClearSelection={() => setSelected(new Set())}
                     onSelectMany={setSelected}
+                    currentPath={currentPath}
+                    isPinned={(folderPath) =>
+                      pins.some((pin) => pin.path === folderPath)
+                    }
+                    onPinCurrent={togglePin}
                     readOnly={listing?.readOnly ?? true}
                     onPaste={() => void paste()}
                     canPaste={!!clipboard}
@@ -1939,6 +1956,7 @@ export function App({
       {findOpen && (
         <FindPanel
           path={currentPath}
+          home={session.home}
           hidden={hidden}
           onClose={() => setFindOpen(false)}
           onOpen={(result) => {
