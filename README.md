@@ -37,7 +37,7 @@ The development UI uses port 4317 and proxies the filesystem service on port 431
 - Mounted SSHFS folders, including read-only mounts. Frost uses their local paths and does not establish SSH connections.
 - Image thumbnails; image, PDF, audio, video, Markdown, code, and text previews. Unsupported files retain metadata and can be checked for readable text.
 - A resizable inspector and Quick View. Images and videos determine the preview window's proportions within screen limits; documents use a scrolling reading area. Space opens and closes Quick View.
-- Open in default app and an Open with chooser populated from registered Linux file associations, plus Open folder in new browser tab. File changes made in Frost notify other tabs on the same origin.
+- Open in default app and an Open with submenu populated from registered Linux file associations, plus Open folder in new browser tab. In file menus, hover over Open with or click it to expand the submenu. In Quick View, click Open with for an anchored dropdown; the preview stays open. File changes made in Frost notify other tabs on the same origin.
 - Light/dark/system appearance, a matching app lock, delayed loading indicator, and notifications with a countdown that pauses during interaction.
 
 File operations affect real files. Name collisions are reported and skipped; there is no overwrite action. Files changed concurrently by another process can cause an operation to fail. Refresh or refocus Frost after external changes.

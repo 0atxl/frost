@@ -35,6 +35,7 @@ import type { FileEntry } from "../../shared/types";
 import { thumbnailUrl } from "@/lib/api";
 import { fileType, formatDate, formatSize, type SortBy } from "@/lib/utils";
 import { FileIcon } from "./file-icon";
+import { OpenWithSubmenu } from "./open-with";
 import { Button } from "./ui/button";
 
 export type FileAction =
@@ -656,18 +657,26 @@ export function FileBrowser({
         >
           {contextFiles.length ? (
             fileActionsFor(contextFiles[0], contextFiles.length).map(
-              ({ id, label, icon: Icon, shortcut }) => (
-                <Context.Item
-                  key={id}
-                  className={`menu-item ${id === "trash" ? "menu-danger" : ""}`}
-                  disabled={busy || fileActionDisabled(id, contextFiles)}
-                  onSelect={() => onAction(id, contextFiles)}
-                >
-                  <Icon size={15} />
-                  <span>{label}</span>
-                  {shortcut && <span className="menu-key">{shortcut}</span>}
-                </Context.Item>
-              ),
+              ({ id, label, icon: Icon, shortcut }) =>
+                id === "open-with" ? (
+                  <OpenWithSubmenu
+                    key={id}
+                    file={contextFiles[0]}
+                    kind="context"
+                    disabled={busy || fileActionDisabled(id, contextFiles)}
+                  />
+                ) : (
+                  <Context.Item
+                    key={id}
+                    className={`menu-item ${id === "trash" ? "menu-danger" : ""}`}
+                    disabled={busy || fileActionDisabled(id, contextFiles)}
+                    onSelect={() => onAction(id, contextFiles)}
+                  >
+                    <Icon size={15} />
+                    <span>{label}</span>
+                    {shortcut && <span className="menu-key">{shortcut}</span>}
+                  </Context.Item>
+                ),
             )
           ) : (
             <>

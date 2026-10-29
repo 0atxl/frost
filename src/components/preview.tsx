@@ -3,7 +3,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
-  ExternalLink,
   Link2,
   LoaderCircle,
   Maximize2,
@@ -11,12 +10,12 @@ import {
   X,
 } from "lucide-react";
 import type { FileEntry } from "../../shared/types";
-import { api, fileUrl } from "@/lib/api";
+import { fileUrl } from "@/lib/api";
 import { fileType, formatDate, formatSize } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Tip } from "./ui/tooltip";
 import { FileIcon } from "./file-icon";
-import { toast } from "./ui/notifications";
+import { OpenWithButton } from "./open-with";
 const PdfPreview = lazy(() => import("./pdf-preview"));
 const TextContent = lazy(() => import("./text-preview"));
 
@@ -185,11 +184,9 @@ export function Preview({
   hasNext = false,
   onMediaSize,
   onDetailsChange,
-  onOpenWith,
   selectionCount = 0,
   line,
 }: {
-  onOpenWith?: (file: FileEntry) => void;
   selectionCount?: number;
   line?: number;
   file: FileEntry | null;
@@ -255,21 +252,7 @@ export function Preview({
               </Button>
             </Tip>
             {file && file.kind !== "folder" && (
-              <Tip label={onOpenWith ? "Open with…" : "Open in default app"}>
-                <Button
-                  size="icon"
-                  aria-label={onOpenWith ? "Open with…" : "Open in default app"}
-                  onClick={() =>
-                    onOpenWith
-                      ? onOpenWith(file)
-                      : void api
-                          .openExternal(file.path)
-                          .catch((error) => toast.error(error.message))
-                  }
-                >
-                  <ExternalLink />
-                </Button>
-              </Tip>
+              <OpenWithButton key={file.path} file={file} />
             )}
           </div>
         </header>

@@ -14,7 +14,6 @@ export function QuickView({
   onChange,
   onOpen,
   onCopyPath,
-  onOpenWith,
   line,
 }: {
   file: FileEntry | null;
@@ -22,7 +21,6 @@ export function QuickView({
   onChange: (file: FileEntry | null) => void;
   onOpen: (path: string) => void;
   onCopyPath: (path: string) => void;
-  onOpenWith: (file: FileEntry) => void;
   line?: number;
 }) {
   const [viewport, setViewport] = useState({
@@ -94,7 +92,7 @@ export function QuickView({
           if (
             event.code === "Space" &&
             !(event.target as HTMLElement).closest(
-              "input,textarea,select,[contenteditable=true]",
+              'input,textarea,select,[contenteditable=true],[role="menu"]',
             )
           ) {
             event.preventDefault();
@@ -119,7 +117,6 @@ export function QuickView({
           large
           onOpen={onOpen}
           onCopyPath={onCopyPath}
-          onOpenWith={onOpenWith}
           line={line}
           onMediaSize={(width, height) => {
             if (file && width > 0 && height > 0)

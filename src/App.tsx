@@ -83,7 +83,7 @@ import {
 import { Preview } from "./components/preview";
 import { QuickView } from "./components/quick-view";
 import { ChangeKey } from "./components/change-key";
-import { OpenWith } from "./components/open-with";
+import { OpenWithSubmenu } from "./components/open-with";
 import { FindPanel } from "./components/find-panel";
 
 interface Pin {
@@ -154,7 +154,6 @@ export function App({
   const [searchOpen, setSearchOpen] = useState(false);
   const [findOpen, setFindOpen] = useState(false);
   const [changeKey, setChangeKey] = useState(false);
-  const [openWith, setOpenWith] = useState<FileEntry | null>(null);
   const [findLine, setFindLine] = useState<{
     path: string;
     line: number;
@@ -518,7 +517,6 @@ export function App({
         "_blank",
         "noopener,noreferrer",
       );
-    if (action === "open-with") setOpenWith(file);
     if (action === "external")
       void api
         .openExternal(file.path)
@@ -716,7 +714,6 @@ export function App({
         shortcuts ||
         findOpen ||
         changeKey ||
-        openWith ||
         event.defaultPrevented
       )
         return;
@@ -1426,25 +1423,38 @@ export function App({
                           fileActionsFor(
                             focusedFile || undefined,
                             selectedFiles.length,
-                          ).map(({ id, label, icon: Icon, shortcut }) => (
-                            <Dropdown.Item
-                              key={id}
-                              className={cn(
-                                "menu-item",
-                                id === "trash" && "menu-danger",
-                              )}
-                              disabled={
-                                !!busy || fileActionDisabled(id, selectedFiles)
-                              }
-                              onSelect={() => handleAction(id)}
-                            >
-                              <Icon size={15} />
-                              <span>{label}</span>
-                              {shortcut && (
-                                <span className="menu-key">{shortcut}</span>
-                              )}
-                            </Dropdown.Item>
-                          ))
+                          ).map(({ id, label, icon: Icon, shortcut }) =>
+                            id === "open-with" ? (
+                              <OpenWithSubmenu
+                                key={id}
+                                file={selectedFiles[0]}
+                                kind="dropdown"
+                                disabled={
+                                  !!busy ||
+                                  fileActionDisabled(id, selectedFiles)
+                                }
+                              />
+                            ) : (
+                              <Dropdown.Item
+                                key={id}
+                                className={cn(
+                                  "menu-item",
+                                  id === "trash" && "menu-danger",
+                                )}
+                                disabled={
+                                  !!busy ||
+                                  fileActionDisabled(id, selectedFiles)
+                                }
+                                onSelect={() => handleAction(id)}
+                              >
+                                <Icon size={15} />
+                                <span>{label}</span>
+                                {shortcut && (
+                                  <span className="menu-key">{shortcut}</span>
+                                )}
+                              </Dropdown.Item>
+                            ),
+                          )
                         ) : actionsPage === "lock" ? (
                           <Dropdown.RadioGroup
                             value={String(idleMinutes)}
@@ -1926,13 +1936,6 @@ export function App({
         </DialogContent>
       </Dialog>
       {changeKey && <ChangeKey onClose={() => setChangeKey(false)} />}
-      {openWith && (
-        <OpenWith
-          key={openWith.path}
-          file={openWith}
-          onClose={() => setOpenWith(null)}
-        />
-      )}
       {findOpen && (
         <FindPanel
           path={currentPath}
@@ -1959,10 +1962,6 @@ export function App({
         onChange={(file) => {
           setFindLine(null);
           setQuickLook(file);
-        }}
-        onOpenWith={(file) => {
-          setQuickLook(null);
-          setOpenWith(file);
         }}
         onOpen={go}
         onCopyPath={copyPath}
