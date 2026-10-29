@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.env
+.env.local
+.frost-data/
+.frost-qa/
+*.log
+
+# Local agent notes and tool configuration
+.agent-notes/
+.agents/
+.codex/
+.aws/
+AGENTS.md
+CLAUDE.md
+
+# Local credentials and environment overrides
+.env.*
+!.env.example
