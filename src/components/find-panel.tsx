@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircle, Search, Square } from "lucide-react";
+import {
+  ArrowUpDown,
+  CornerDownLeft,
+  Folder,
+  LoaderCircle,
+  Search,
+  Square,
+} from "lucide-react";
 import type { FindResponse, FindResult } from "../../shared/types";
 import { api } from "@/lib/api";
 import {
@@ -67,6 +74,7 @@ export function FindPanel({
       ?.scrollIntoView({ block: "nearest" });
   }, [active]);
   const items = data?.results ?? [];
+  const hasQuery = !!query.trim();
   return (
     <Dialog
       open
@@ -76,44 +84,28 @@ export function FindPanel({
     >
       <DialogContent
         className="find-dialog"
+        overlayClassName="find-overlay"
+        showCloseButton={false}
         onCloseAutoFocus={(event) => event.preventDefault()}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            event.preventDefault();
-            setActive((old) =>
-              Math.max(
-                0,
-                Math.min(
-                  items.length - 1,
-                  old + (event.key === "ArrowDown" ? 1 : -1),
-                ),
-              ),
-            );
-          } else if (
-            event.key === "Enter" &&
-            items[active] &&
-            (event.target as HTMLElement).matches('input[type=search], [role="option"]')
-          ) {
-            event.preventDefault();
-            onOpen(items[active]);
-          }
-        }}
       >
-        <DialogTitle>Find</DialogTitle>
-        <DialogDescription className="find-scope" title={path}>
-          {path}
+        <DialogTitle className="sr-only">Find files</DialogTitle>
+        <DialogDescription className="sr-only">
+          Search names or file contents in {path}. Use arrow keys to select a
+          result and Enter to open it.
         </DialogDescription>
         <div className="find-input">
-          <Search size={16} />
+          <Search size={20} strokeWidth={1.6} />
           <input
             type="search"
             autoFocus
             maxLength={200}
+            autoComplete="off"
+            spellCheck={false}
             aria-label={
               mode === "names" ? "Find filenames" : "Find text in files"
             }
             placeholder={
-              mode === "names" ? "Find filenames…" : "Find text in files…"
+              mode === "names" ? "Find files" : "Find in file contents"
             }
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -124,9 +116,28 @@ export function FindPanel({
             aria-activedescendant={
               items[active] ? `find-result-${active}` : undefined
             }
+            onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing) return;
+              if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                setActive((old) =>
+                  Math.max(
+                    0,
+                    Math.min(
+                      items.length - 1,
+                      old + (event.key === "ArrowDown" ? 1 : -1),
+                    ),
+                  ),
+                );
+              } else if (event.key === "Enter" && items[active]) {
+                event.preventDefault();
+                onOpen(items[active]);
+              }
+            }}
           />
           {busy && (
             <button
+              className="find-cancel"
               aria-label="Cancel search"
               title="Cancel search"
               onClick={() => {
@@ -135,9 +146,16 @@ export function FindPanel({
                 setCancelled(true);
               }}
             >
-              <Square size={13} />
+              <Square size={12} />
             </button>
           )}
+          <button
+            className="find-dismiss"
+            aria-label="Close Find"
+            onClick={onClose}
+          >
+            <kbd>esc</kbd>
+          </button>
         </div>
         <div className="find-options">
           <div className="view-switch" aria-label="Search mode">
@@ -163,6 +181,10 @@ export function FindPanel({
             Include subfolders
           </label>
         </div>
+        <div className="find-scope" title={path}>
+          <Folder size={12} />
+          <span>{path}</span>
+        </div>
         <div
           className="find-results"
           ref={results}
@@ -178,11 +200,13 @@ export function FindPanel({
               data-result={index}
               role="option"
               aria-selected={index === active}
+              tabIndex={-1}
               className={index === active ? "is-active" : ""}
-              onFocus={() => setActive(index)}
+              onMouseMove={() => setActive(index)}
+              onMouseDown={(event) => event.preventDefault()}
               onClick={() => onOpen(item)}
             >
-              <FileIcon kind={item.file.kind} size={18} />
+              <FileIcon kind={item.file.kind} size={20} />
               <span className="find-result-text">
                 <span className="find-result-title">
                   {item.file.name}
@@ -197,40 +221,45 @@ export function FindPanel({
               </span>
             </button>
           ))}
-          {!items.length && (
-            <p className="find-message" role="status">
-              {busy ? (
-                <>
-                  <LoaderCircle className="spin" size={16} />
-                  Searching…
-                </>
-              ) : (
-                error ||
-                (cancelled
-                  ? "Search cancelled."
-                  : query.trim()
-                    ? "No matches."
-                    : mode === "names"
-                      ? "Find by filename, even with letters missing."
-                      : "Search for a word or phrase inside text files.")
+        </div>
+        {hasQuery && !items.length && (
+          <p className="find-message" role="status">
+            {busy ? (
+              <>
+                <LoaderCircle className="spin" size={15} />
+                Searching…
+              </>
+            ) : (
+              error || (cancelled ? "Search cancelled." : "No matches.")
+            )}
+          </p>
+        )}
+        {data && (
+          <footer className="find-status">
+            <div className="find-status-row">
+              <span role="status">
+                {items.length} {items.length === 1 ? "match" : "matches"}
+              </span>
+              {!!items.length && (
+                <span className="find-keys" aria-hidden="true">
+                  <ArrowUpDown size={12} />
+                  Select
+                  <CornerDownLeft size={12} />
+                  Open
+                </span>
               )}
-            </p>
-          )}
-        </div>
-        <div className="find-status" role="status">
-          {data && (
-            <span>
-              {items.length} {items.length === 1 ? "match" : "matches"}
-              {data.limited ? " · Partial results; narrow the search" : ""}
-              {data.skipped
-                ? ` · ${data.skipped} files or folders skipped or partly read`
-                : ""}
-            </span>
-          )}
-          {mode === "contents" && (
-            <span>Text files · first 256 KB · up to 5 lines per file</span>
-          )}
-        </div>
+            </div>
+            {data.limited && <span>Partial results. Narrow the search.</span>}
+            {!!data.skipped && (
+              <span>
+                {data.skipped} files or folders skipped or partly read
+              </span>
+            )}
+            {mode === "contents" && (
+              <span>Text files · first 256 KB · up to 5 lines per file</span>
+            )}
+          </footer>
+        )}
       </DialogContent>
     </Dialog>
   );

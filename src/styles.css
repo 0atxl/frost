@@ -1981,25 +1981,35 @@
     font-size: 12px;
     color: var(--muted);
   }
+  .find-overlay {
+    background: #0003;
+    backdrop-filter: blur(2px);
+  }
   .find-dialog {
-    width: min(680px, calc(100vw - 32px));
-    padding: 20px;
-  }
-  .find-scope {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-right: 20px;
-  }
-  .find-input {
+    --find-top: min(18dvh, 160px);
+    width: min(620px, calc(100vw - 32px));
+    top: var(--find-top);
+    transform: translateX(-50%);
+    padding: 0;
+    border-radius: 12px;
+    max-height: calc(100dvh - var(--find-top) - 16px);
     display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--menu);
+    backdrop-filter: blur(24px) saturate(1.25);
+    box-shadow:
+      0 0 0 0.5px var(--line),
+      0 18px 55px #0003;
+  }
+  .find-dialog .find-input {
+    display: flex;
+    flex-shrink: 0;
     align-items: center;
-    gap: 8px;
-    height: 36px;
-    padding: 0 10px;
-    border-radius: 6px;
-    background: var(--field);
-    margin-top: 16px;
+    gap: 12px;
+    height: 60px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--line);
   }
   .find-input > svg {
     color: var(--muted);
@@ -2007,23 +2017,50 @@
   .find-input input {
     min-width: 0;
     flex: 1;
+    width: 100%;
+    height: 100%;
     border: 0;
     background: none;
     outline: none;
     box-shadow: none;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
-  .find-input:focus-within {
-    box-shadow: 0 0 0 1px var(--accent);
+  .find-input input::placeholder {
+    color: var(--muted);
   }
-  .find-input button {
+  .find-input input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .find-dismiss,
+  .find-cancel {
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    border-radius: 4px;
     padding: 4px;
+  }
+  .find-dismiss:hover,
+  .find-cancel:hover {
+    background: var(--hover);
+    color: var(--text);
+  }
+  .find-dismiss kbd {
+    font: inherit;
+    font-size: 11px;
+    line-height: 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 0 4px;
   }
   .find-options {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin: 12px 0;
+    padding: 10px 12px 6px;
   }
   .find-options .view-switch button {
     width: auto;
@@ -2040,23 +2077,47 @@
   .find-options input {
     accent-color: var(--accent);
   }
+  .find-scope {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 17px 12px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .find-scope span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .find-results {
-    height: min(360px, 45dvh);
+    min-height: 0;
+    max-height: min(360px, 48dvh);
     overflow-y: auto;
     overscroll-behavior: contain;
+    padding: 0 6px;
+  }
+  .find-results:not(:empty) {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-top: 1px solid var(--line);
   }
   .find-results > button {
     display: flex;
     align-items: flex-start;
     text-align: left;
     width: 100%;
-    padding: 9px 10px;
+    padding: 9px 11px;
     gap: 10px;
-    border-radius: 5px;
+    border-radius: 6px;
     margin-bottom: 2px;
   }
+  .find-results > button:last-child {
+    margin-bottom: 0;
+  }
   .find-results > button > svg {
-    margin-top: 2px;
+    margin-top: 3px;
   }
   .find-results > button:hover {
     background: var(--hover);
@@ -2075,12 +2136,14 @@
     align-items: baseline;
     gap: 8px;
     overflow-wrap: anywhere;
+    font-weight: 500;
   }
   .find-result-title small {
     white-space: nowrap;
     margin-left: auto;
     color: var(--muted);
     font-size: 11px;
+    font-weight: 400;
   }
   .find-result-path,
   .find-snippet {
@@ -2093,23 +2156,39 @@
   .find-snippet {
     color: var(--text);
   }
-  .find-message {
+  .find-dialog .find-message {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 26px 10px;
+    padding: 20px 16px;
     color: var(--muted);
     font-size: 12px;
+    border-top: 1px solid var(--line);
   }
   .find-status {
     display: grid;
-    gap: 3px;
+    flex-shrink: 0;
+    gap: 4px;
     font-size: 11px;
     color: var(--muted);
-    padding-top: 10px;
+    padding: 8px 16px;
     border-top: 1px solid var(--line);
-    min-height: 25px;
+  }
+  .find-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .find-keys {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .find-keys svg:nth-of-type(2) {
+    margin-left: 8px;
   }
   .matched-line {
     display: inline-block;

@@ -30,7 +30,7 @@ The development UI uses port 4317 and proxies the filesystem service on port 431
 
 - Full path entry, `~` expansion, back/forward/up navigation, Favorites, and pinned folders.
 - Grid and list layouts, sorting, hidden files, and filename filtering within the current folder.
-- A separate Find panel with fuzzy filename matching, text-content search, optional subfolders, keyboard navigation, and matching-line previews. Open it with Find or Ctrl/Cmd + K.
+- A Spotlight-style Find panel with fuzzy filename matching, text-content search, optional subfolders, keyboard navigation, and matching-line previews. Open it with Find or Ctrl/Cmd + K.
 - Drag-selection rectangles with edge scrolling, keyboard selection, copy/cut/paste, folder creation, rename, and moves within a filesystem.
 - System Trash with restore, Undo when the desktop returns the new Trash item, permanent deletion, and confirmed emptying. Old Frost Trash items remain available for recovery.
 - Mounted drives and volumes in the Devices sidebar, refreshed every eight seconds. Unmounted volumes are labeled through their tooltip and remain disabled; mount or unlock them using the system desktop.
@@ -69,7 +69,7 @@ While locked, Ctrl/Cmd + F toggles local recovery instructions and Escape dismis
 
 ## Find
 
-The existing filter narrows the visible folder by filename. **Find** is separate: Names ranks fuzzy filename matches; Contents looks for a case-insensitive word or phrase inside text, code, or readable files without a recognized extension. Choose Include subfolders to search recursively. The current Show hidden files setting applies. Folder symlinks are not traversed, and special files, system interfaces, and Frost’s data folder are excluded. Filesystem permissions are unchanged, including on SSHFS.
+The existing filter narrows the visible folder by filename. **Find** opens a compact panel above the center of the screen. Its height grows with results, then the list scrolls. Type to search, use arrow keys to select, Enter to open, and Escape to close. Names and Contents share the same panel: Names ranks fuzzy filename matches; Contents looks for a case-insensitive word or phrase inside text, code, or readable files without a recognized extension. Choose Include subfolders to search recursively. The current Show hidden files setting applies. Folder symlinks are not traversed, and special files, system interfaces, and Frost’s data folder are excluded. Filesystem permissions are unchanged, including on SSHFS.
 
 Search runs on demand without a persistent index. It returns up to 250 results, examines up to 10,000 entries, and stops at the next filesystem-operation boundary after ten seconds. Slow or disconnected network mounts can delay an operation. Cancel stops the request and further traversal once pending filesystem I/O finishes. Contents reads the first 256 KB and returns up to five matching lines per file. The panel reports partial or skipped results. Opening a content result shows the matching line in Quick View.
 
