@@ -17,7 +17,10 @@ export class AppLock {
   private file: string;
   readonly streams = new Map<() => void, string>();
 
-  constructor(dataDir: string) {
+  constructor(
+    dataDir: string,
+    private onLocked: () => void = () => {},
+  ) {
     this.file = path.join(dataDir, "access.json");
   }
   async initialize() {
@@ -50,6 +53,7 @@ export class AppLock {
   private revoke(id: string) {
     this.sessions.delete(id);
     for (const [stop, owner] of this.streams) if (owner === id) stop();
+    if (!this.sessions.size) this.onLocked();
   }
   prune() {
     for (const id of this.sessions.keys()) this.get(id);
@@ -154,6 +158,7 @@ export class AppLock {
     this.sessions.clear();
     for (const stop of this.streams.keys()) stop();
     this.streams.clear();
+    this.onLocked();
   }
   async setIdle(minutes: number) {
     if (this.checking)

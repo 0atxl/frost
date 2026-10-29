@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import type { FileEntry } from "../../shared/types";
 import { thumbnailUrl } from "@/lib/api";
+import { CachedThumbnail } from "./cached-thumbnail";
 import { fileType, formatDate, formatSize, type SortBy } from "@/lib/utils";
 import { FileIcon } from "./file-icon";
 import { OpenWithSubmenu } from "./open-with";
@@ -102,7 +103,9 @@ function Thumbnail({ file }: { file: FileEntry }) {
   useEffect(() => setFailed(false), [file.path, file.modified]);
   return (
     <div className={`thumbnail thumbnail-${file.kind}`}>
-      {file.kind === "image" && !failed && file.accessible ? (
+      {file.kind === "image" && file.accessible && file.extension !== "svg" ? (
+        <CachedThumbnail file={file} />
+      ) : file.kind === "image" && !failed && file.accessible ? (
         <img
           src={thumbnailUrl(file)}
           alt=""

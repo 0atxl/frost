@@ -8,10 +8,10 @@ import { createReadStream } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { timingSafeEqual } from "node:crypto";
-import sharp from "sharp";
 import mime from "mime-types";
 import { FileSystem, FileError, errorMessage } from "./filesystem.js";
 import { AppLock } from "./auth.js";
+import { Thumbnails } from "./thumbnails.js";
 import { DesktopFiles, desktop } from "./desktop.js";
 import { findFiles } from "./find.js";
 import type { Session } from "../shared/types.js";
@@ -100,43 +100,11 @@ export function byteRange(
 export async function createApp(options: AppOptions) {
   const files = new FileSystem(options.root, options.dataDir);
   await files.initialize();
-  const lock = new AppLock(files.dataDir);
+  const thumbnails = new Thumbnails();
+  const lock = new AppLock(files.dataDir, () => thumbnails.clear());
   await lock.initialize();
   const desktopFiles = new DesktopFiles(files);
   let searchJobs = 0;
-  const thumbnails = new Map<string, Buffer>();
-  sharp.concurrency(2);
-  let thumbnailJobs = 0;
-  const thumbnailWaiters: (() => void)[] = [];
-  async function thumbnail(file: string) {
-    const stat = await fs.stat(file);
-    if (!stat.isFile() || stat.size > 100 * 1024 * 1024)
-      throw new FileError("This image is too large for a thumbnail.", 413);
-    const key = `${file}:${stat.mtimeMs}:${stat.size}`;
-    const cached = thumbnails.get(key);
-    if (cached) return cached;
-    if (thumbnailJobs >= 3)
-      await new Promise<void>((resolve) => thumbnailWaiters.push(resolve));
-    thumbnailJobs++;
-    try {
-      const image = await sharp(file, {
-        limitInputPixels: 64_000_000,
-        animated: false,
-      })
-        .rotate()
-        .resize(400, 280, { fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 78 })
-        .toBuffer();
-      if (thumbnails.size >= 128)
-        thumbnails.delete(thumbnails.keys().next().value!);
-      thumbnails.set(key, image);
-      return image;
-    } finally {
-      thumbnailJobs--;
-      thumbnailWaiters.shift()?.();
-    }
-  }
-
   const server = createServer(async (req, res) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Referrer-Policy", "no-referrer");
@@ -312,7 +280,8 @@ export async function createApp(options: AppOptions) {
           if (entry.kind !== "image" || entry.extension === "svg")
             throw new FileError("No generated thumbnail for this file.", 415);
           try {
-            const bytes = await thumbnail(file);
+            if (!lock.get(cookie)) throw new FileError("Frost is locked.", 401);
+            const bytes = await thumbnails.get(file);
             if (!lock.get(cookie)) throw new FileError("Frost is locked.", 401);
             res.writeHead(200, {
               "Content-Type": "image/webp",
@@ -405,7 +374,6 @@ export async function createApp(options: AppOptions) {
           const data = await body(req);
           if (url.pathname === "/api/auth/lock") {
             lock.lock();
-            thumbnails.clear();
             res.setHeader(
               "Set-Cookie",
               "frost_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",
@@ -425,7 +393,6 @@ export async function createApp(options: AppOptions) {
           }
           if (url.pathname === "/api/auth/key") {
             await lock.changeKey(string(data.currentKey), string(data.newKey));
-            thumbnails.clear();
             res.setHeader(
               "Set-Cookie",
               "frost_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",

@@ -35,7 +35,7 @@ The development UI uses port 4317 and proxies the filesystem service on port 431
 - System Trash with restore, Undo when the desktop returns the new Trash item, permanent deletion, and confirmed emptying. Old Frost Trash items remain available for recovery.
 - Mounted drives and volumes in the Devices sidebar, refreshed every eight seconds. Unmounted volumes are labeled through their tooltip and remain disabled; mount or unlock them using the system desktop.
 - Mounted SSHFS folders, including read-only mounts. Frost uses their local paths and does not establish SSH connections.
-- Image thumbnails; image, PDF, audio, video, Markdown, code, and text previews. Unsupported files retain metadata and can be checked for readable text.
+- Image thumbnails with a bounded memory cache; image, PDF, audio, video, Markdown, code, and text previews. Unsupported files retain metadata and can be checked for readable text.
 - A resizable inspector and Quick View. Images and videos determine the preview window's proportions within screen limits; documents use a scrolling reading area. Space opens and closes Quick View.
 - Open in default app and an Open with submenu populated from registered Linux file associations, plus Open folder in new browser tab. In file menus, hover over Open with or click it to expand the submenu. In Quick View, click Open with for an anchored dropdown; the preview stays open. File changes made in Frost notify other tabs on the same origin.
 - Light/dark/system appearance, a matching app lock, delayed loading indicator, and notifications with a countdown that pauses during interaction.
@@ -72,6 +72,16 @@ While locked, Ctrl/Cmd + F toggles local recovery instructions and Escape dismis
 The existing filter narrows the visible folder by filename. **Find** opens a compact 460px panel above the center of the screen. Its height grows with results, then the list scrolls. Type to search, use arrow keys to select, Enter to open, and Escape to close. Names and Contents share the same panel: Names ranks fuzzy filename matches; Contents looks for a case-insensitive word or phrase inside text, code, or readable files without a recognized extension. Names/Contents sits beside the query; the folder scope and Subfolders checkbox share the row below. Enable Subfolders to search recursively. The current Show hidden files setting applies. Folder symlinks are not traversed, and special files, system interfaces, and Frost’s data folder are excluded. Filesystem permissions are unchanged, including on SSHFS.
 
 Search runs on demand without a persistent index. It returns up to 250 results, examines up to 10,000 entries, and stops at the next filesystem-operation boundary after ten seconds. Slow or disconnected network mounts can delay an operation. Cancel stops the request and further traversal once pending filesystem I/O finishes. Contents reads the first 256 KB and returns up to five matching lines per file. A small Partial results indicator appears when limits or skipped files affect the results; hover or focus it for details. Opening a content result shows the matching line in Quick View.
+
+## Thumbnail cache
+
+Grid view reuses generated image thumbnails when you revisit a folder. Each browser tab keeps up to 32 MiB of compressed thumbnails in memory, and the server has a separate 32 MiB cache shared across tabs. Each cache also has a 1,024-entry limit and drops the least recently used entries first. These limits cover cached image payloads; decoding, visible images, and the rest of the app use additional RAM.
+
+Frost requests thumbnails only near the visible area, with at most two requests per tab and two image-generation jobs on the server. File paths, modification times, and sizes identify cached versions. Refresh or refocus after external file changes so the folder listing picks up their new versions.
+
+Locking clears the tab caches and the shared server cache. Automatic expiry clears each expired tab's cache, and the server cache clears when the last session expires. Closing a tab or restarting the server also discards its cache. Frost does not save thumbnail cache files or use persistent browser storage for them. Thumbnail responses use `Cache-Control: no-store`.
+
+SVGs display directly. PDFs, videos, and other file types keep their existing icons in the grid; their Quick View previews are unchanged.
 
 ## Trash
 

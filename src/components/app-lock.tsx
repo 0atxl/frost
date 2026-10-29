@@ -8,6 +8,7 @@ import {
 import type { LockStatus } from "../../shared/types";
 import { api } from "../lib/api";
 import { readStorage } from "../lib/utils";
+import { clearThumbnailCache } from "../lib/thumbnail-cache";
 import { toast } from "./ui/notifications";
 import { App } from "../App";
 
@@ -57,10 +58,12 @@ export function AppLock() {
       );
       setConnectionError("");
       if (!next.unlocked) {
+        clearThumbnailCache();
         toast.dismiss();
         document.title = "Frost";
       }
     } catch {
+      clearThumbnailCache();
       setConnectionError(
         "Cannot connect to Frost. Check that the local server is running.",
       );
@@ -71,6 +74,7 @@ export function AppLock() {
     void sync();
     const timer = window.setInterval(sync, 5000);
     const locked = () => {
+      clearThumbnailCache();
       toast.dismiss();
       document.title = "Frost";
       setStatus((old) => old && { ...old, unlocked: false });
@@ -85,6 +89,7 @@ export function AppLock() {
     return () => {
       clearInterval(timer);
       channel.current?.close();
+      clearThumbnailCache();
       window.removeEventListener("frost:locked", locked);
       window.removeEventListener("focus", sync);
     };
@@ -162,6 +167,7 @@ export function AppLock() {
   async function lock() {
     try {
       await api.lock();
+      clearThumbnailCache();
       toast.dismiss();
       document.title = "Frost";
       setStatus((old) => old && { ...old, unlocked: false });
