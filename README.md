@@ -65,7 +65,7 @@ The server verifies the access key using a salted scrypt hash and throttles fail
 
 The service listens only on `127.0.0.1`, checks hosts and origins, and uses an HttpOnly SameSite cookie plus a request token for mutations. Preview content is restricted: HTML displays as source, Markdown does not execute HTML or load remote images, and file responses have sandbox headers. This is a personal local app, not a remotely hosted file server. The lock does not encrypt files or replace the operating-system screen lock.
 
-The locked page’s Forgot key link explains local recovery; it does not bypass authentication. If you forget the key, stop Frost and remove only `FROST_DATA_DIR/access.json`, then restart to create a new key. Do not remove the whole data directory: it may contain earlier Frost Trash files. Anyone who already controls your OS account can perform this reset.
+While locked, Ctrl/Cmd + F toggles local recovery instructions and Escape dismisses them. Recovery instructions do not bypass authentication. If you forget the key, stop Frost and remove only `FROST_DATA_DIR/access.json`, then restart to create a new key. Do not remove the whole data directory: it may contain earlier Frost Trash files. Anyone who already controls your OS account can perform this reset.
 
 ## Find
 
@@ -84,6 +84,7 @@ Earlier private Trash contents remain under `FROST_DATA_DIR/trash`. They are inc
 | Action                                           | Shortcut                             |
 | ------------------------------------------------ | ------------------------------------ |
 | Edit the path                                    | `/`                                  |
+| Recovery help while locked                       | Ctrl/Cmd + F                         |
 | Filter this folder                               | `F`                                  |
 | Find names or contents                           | Ctrl/Cmd + K                         |
 | Open folder or preview                           | Enter                                |
@@ -107,4 +108,3 @@ Earlier private Trash contents remain under `FROST_DATA_DIR/trash`. They are inc
 - Text previews stop at 256 KB. Very large images keep their file icon. Folder sizes are not calculated recursively.
 - Moves between filesystems remain unsupported; copy works between them. System Trash support depends on the mount and the desktop.
 - No directory merging, overwrite workflow, filesystem repair, drive formatting, or phone management.
-

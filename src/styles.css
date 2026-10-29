@@ -1722,10 +1722,7 @@
     --lock-input: #fff;
     --lock-border: #0000001a;
     --lock-dot: #29292d;
-    --lock-placeholder: #737379;
-    --cursor-x: -200px;
-    --cursor-y: -200px;
-    --dots-visible: 0;
+    --lock-dot-opacity: 0.6;
     height: 100dvh;
     display: grid;
     place-items: center;
@@ -1738,7 +1735,7 @@
     --lock-input: #161618;
     --lock-border: #ffffff1a;
     --lock-dot: #f2f2f4;
-    --lock-placeholder: #6b6b72;
+    --lock-dot-opacity: 0.35;
   }
   .lock-dots {
     position: absolute;
@@ -1765,6 +1762,7 @@
   }
   .lock-form {
     position: relative;
+    height: 40px;
     width: min(360px, calc(100vw - 48px));
   }
   .lock-form input {
@@ -1784,18 +1782,19 @@
       system-ui,
       sans-serif;
     caret-color: var(--text);
-  }
-  .lock-form input::placeholder {
-    color: var(--lock-placeholder);
+    text-align: center;
   }
   .lock-form input:focus-visible {
     border-color: color-mix(in srgb, var(--text) 25%, transparent);
     outline: none;
   }
-  .lock-form p {
+  .lock-support {
     position: absolute;
     top: 100%;
     left: 0;
+    width: 100%;
+  }
+  .lock-form p {
     margin: 10px 2px;
     color: var(--muted);
     font-size: 12px;
@@ -1963,15 +1962,6 @@
   .form-error {
     font-size: 12px;
     color: var(--danger);
-  }
-  .lock-recovery-toggle {
-    display: block;
-    margin: 12px auto 0;
-    color: var(--muted);
-    font-size: 11px;
-  }
-  .lock-recovery-toggle:hover {
-    color: var(--text);
   }
   .lock-form .lock-recovery {
     font-size: 12px;

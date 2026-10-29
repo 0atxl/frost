@@ -24,6 +24,26 @@ export function AppLock() {
   const cursor = useRef({ x: 0, y: 0 });
   const [recovery, setRecovery] = useState(false);
   useEffect(() => () => cancelAnimationFrame(cursorFrame.current), []);
+  useEffect(() => {
+    if (status?.unlocked) {
+      setRecovery(false);
+      return;
+    }
+    const shortcut = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        !event.shiftKey &&
+        event.key.toLowerCase() === "f"
+      ) {
+        event.preventDefault();
+        if (!event.repeat) setRecovery((open) => !open);
+      } else if (event.key === "Escape") {
+        setRecovery(false);
+      }
+    };
+    window.addEventListener("keydown", shortcut, true);
+    return () => window.removeEventListener("keydown", shortcut, true);
+  }, [status?.unlocked]);
   const sync = useCallback(async () => {
     try {
       const next = await api.lockStatus();
@@ -178,7 +198,7 @@ export function AppLock() {
             y = cursor.current.y - 104;
           dots.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
           dots.current.style.backgroundPosition = `${-x % 24}px ${-y % 24}px`;
-          dots.current.style.opacity = "0.35";
+          dots.current.style.opacity = "var(--lock-dot-opacity)";
         });
       }}
       onPointerLeave={() => {
@@ -210,47 +230,43 @@ export function AppLock() {
           autoComplete={
             status?.setupRequired ? "new-password" : "current-password"
           }
-          placeholder={
-            !status
-              ? "Connecting…"
-              : status.setupRequired
-                ? confirmation === null
-                  ? "Create access key"
-                  : "Confirm access key"
-                : "Enter access key"
-          }
           value={key}
           onChange={(event) => setKey(event.target.value)}
           readOnly={busy || !status}
           aria-busy={busy}
           aria-invalid={!!error}
-          aria-describedby={error || connectionError ? "lock-error" : undefined}
+          aria-describedby={
+            error || connectionError
+              ? "lock-error"
+              : recovery
+                ? "lock-recovery"
+                : status?.setupRequired
+                  ? "lock-setup"
+                  : undefined
+          }
         />
-        {(error || connectionError) && (
-          <p id="lock-error" role="alert">
-            {error || connectionError}
-          </p>
-        )}
-        {status && !status.setupRequired && (
-          <>
-            <button
-              type="button"
-              className="lock-recovery-toggle"
-              aria-expanded={recovery}
-              onClick={() => setRecovery(!recovery)}
-            >
-              Forgot key?
-            </button>
-            {recovery && (
-              <p className="lock-recovery">
-                Stop Frost, remove only <code>access.json</code> from its data
-                folder, then restart to create a new key. The default location
-                is <code>.frost-data/access.json</code> in the Frost project.
-                Your files and Trash are kept.
-              </p>
-            )}
-          </>
-        )}
+        <div className="lock-support">
+          {(error || connectionError) && (
+            <p id="lock-error" role="alert">
+              {error || connectionError}
+            </p>
+          )}
+          {status?.setupRequired && !error && !connectionError && !recovery && (
+            <p id="lock-setup" role="status">
+              {confirmation === null
+                ? "Create a key, then press Enter."
+                : "Enter the key again to confirm."}
+            </p>
+          )}
+          {recovery && (
+            <p className="lock-recovery" id="lock-recovery" role="status">
+              Stop Frost, remove only <code>access.json</code> from its data
+              folder, then restart to create a new key. The default location is{" "}
+              <code>.frost-data/access.json</code> in the Frost project. Your
+              files and Trash are kept.
+            </p>
+          )}
+        </div>
       </form>
     </div>
   );
