@@ -65,3 +65,10 @@ jobs:
           desktop_pid=$!
           wait "$desktop_pid"
       - run: npm run build
+      - name: Check landing page scripts
+        run: |
+          for script in landing/*.js landing/*.mjs; do
+            node --check "$script"
+          done
+      - name: Build landing page bundle
+        run: node landing/build.mjs
