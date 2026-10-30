@@ -1,15 +1,25 @@
 # Frost
 
+[![CI](https://github.com/0atxl/frost/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/0atxl/frost/actions/workflows/ci.yml)
+
+[Repository](https://github.com/0atxl/frost), private. GitHub access is required to clone it and view its Actions runs.
+
 A local browser interface for files on your computer. It opens at Home and can navigate anywhere your user account has access. It requires no browser extension and does not upload files.
 
 The toolbar shows clickable breadcrumbs. Click an ancestor to navigate, or click the current folder or press `/` to edit the full path in place. Enter navigates and Escape cancels. The footer shows the folder name and item count. The sidebar, inspector, and Quick View are optional.
 
 ## Run locally
 
-Requires Linux, Node.js 22.13 or newer, npm, Python 3 with PyGObject, and a working GIO/GVfs desktop session. Desktop integration uses the same user session as your system file manager. Start Frost as your normal user, not with sudo.
+Requires Linux, a supported Node.js release satisfying `>=22.13`, npm, Python 3 with PyGObject, and a working GIO/GVfs desktop session. CI uses Node.js 24. Desktop integration uses the same user session as your system file manager. Start Frost as your normal user, not with sudo.
+
+On Ubuntu/Debian, install desktop dependencies with `sudo apt install python3-gi gir1.2-glib-2.0 gvfs gvfs-backends`. On Arch Linux, use `sudo pacman -S python-gobject gvfs`. Run inside your normal graphical desktop session with its session D-Bus available.
+
+Clone using SSH with a key registered to a GitHub account that has repository access:
 
 ```sh
-npm install
+git clone git@github.com:0atxl/frost.git
+cd frost
+npm ci
 npm run build
 npm start
 ```
@@ -118,3 +128,9 @@ Earlier private Trash contents remain under `FROST_DATA_DIR/trash`. They are inc
 - Text previews stop at 256 KB. Very large images keep their file icon. Folder sizes are not calculated recursively.
 - Moves between filesystems remain unsupported; copy works between them. System Trash support depends on the mount and the desktop.
 - No directory merging, overwrite workflow, filesystem repair, drive formatting, or phone management.
+
+## CI and releases
+
+The [CI workflow](https://github.com/0atxl/frost/actions/workflows/ci.yml) runs the complete `npm test` suite and `npm run build`, including TypeScript compilation, on GitHub-hosted Ubuntu runners for pushes, pull requests, and manual dispatches. Tests use temporary filesystem fixtures. GIO Trash coverage runs in a private D-Bus session with isolated XDG state. Lock, Find, and thumbnail tests cover server behavior and browser-cache logic without launching a browser.
+
+CI does not validate attached drives, SSHFS mounts, graphical application launching, browser interactions, or media codec support. Check these manually in your desktop session before a release. After a passing run, review the changes and coverage limits, tag the chosen commit, and create a private GitHub release if needed. Install or update locally with `npm ci`, `npm run build`, and `npm start`; stop the existing process before restarting. Frost stays on loopback and has no GitHub Pages deployment.

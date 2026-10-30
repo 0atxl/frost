@@ -19,3 +19,15 @@ CLAUDE.md
 # Local credentials and environment overrides
 .env.*
 !.env.example
+.envrc
+.npmrc
+.netrc
+.ssh/
+.gnupg/
+credentials.json
+credentials.local.*
+*.pem
+*.key
+*.p12
+*.pfx
+coverage/
