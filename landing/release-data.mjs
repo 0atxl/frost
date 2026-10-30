@@ -69,7 +69,15 @@ export function releaseHtml(html, release) {
   const note = release.available
     ? `Frost ${escape(release.version)} for Linux x64 with SSE4.2. Ubuntu 22.04 / glibc 2.35 or later. Node.js is included. ` +
       `<a href="${escape(release.releaseUrl)}">Release notes</a> · <a href="${escape(release.checksums.url)}">SHA-256 checksums</a>`
-    : 'No public binary download is available right now. Install from the public source repository below.';
+    : 'No public binary download is available right now. Use the AUR package or the source installation below.';
+  const installation = release.available
+    ? `<p>Download the <a href="${escape(download.url)}">Linux x64 archive</a> and ` +
+      `<a href="${escape(release.checksums.url)}">SHA256SUMS</a> into the same directory, then run:</p>` +
+      `<pre><code>sha256sum --ignore-missing --check SHA256SUMS\n` +
+      `tar -xzf ${escape(download.name)}\n./frost-${escape(release.version)}-linux-x64/frost</code></pre>` +
+      `<p>Requires Linux x64 with SSE4.2 and glibc ≥2.35. Node.js is included; install the desktop dependencies below.</p>`
+    : '<p>A public Linux archive is currently unavailable. Use the AUR package or install from source.</p>';
   return html.replaceAll('href="#install" data-release-button>Install from source', button)
-    .replace('<!-- release-status -->', note);
+    .replace('<!-- release-status -->', note)
+    .replace('<!-- release-install -->', installation);
 }

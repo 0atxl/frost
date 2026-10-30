@@ -2,6 +2,26 @@
 
 Frost is MIT licensed. Third-party code keeps its own licenses. Binary archives include `LICENSE`, `runtime/LICENSE`, `THIRD_PARTY_NOTICES.json`, copied build dependency notices, the Inter font license, and the original production dependency licenses.
 
+## Arch Linux through AUR
+
+The [frost AUR package](https://aur.archlinux.org/packages/frost) uses system Node, Python, PyGObject, GIO/GVfs and libvips. With an AUR helper:
+
+```sh
+yay -S frost
+frost
+```
+
+Use `paru -S frost` instead if you use paru. To build without a helper, review the AUR recipe and run as your normal user:
+
+```sh
+git clone https://aur.archlinux.org/frost.git
+cd frost
+makepkg -si
+frost
+```
+
+Open `http://127.0.0.1:4317` and keep the process running. When switching from a source installation, select its existing data directory with `FROST_DATA_DIR` as explained below.
+
 ## Linux x64 archive
 
 Download the archive and `SHA256SUMS` from the same [stable release](https://github.com/0atxl/frost/releases/latest). Verify before extracting:
@@ -65,6 +85,6 @@ The publish job explicitly calls Website redeploy after publishing all stable as
 
 Repository visibility is never changed by these workflows. Public website metadata uses anonymous requests, and private releases do not produce public download links. The website reads GitHub's latest stable release at build time. Drafts, prereleases, missing assets, unavailable GitHub responses and checksum mismatches produce a source-install state.
 
-## AUR preparation
+## AUR maintenance
 
-See `packaging/aur/README.md` and its PKGBUILD. Submission to AUR is a separate maintainer action. Nothing here publishes to AUR or installs user state into system directories.
+See `packaging/aur/README.md` and its PKGBUILD. AUR updates are explicit maintainer pushes, separate from GitHub release publication. No workflow publishes to AUR or installs user state into system directories.

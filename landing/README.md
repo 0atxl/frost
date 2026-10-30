@@ -37,6 +37,14 @@ Only the allowlisted static files in `dist/` deploy. There are no functions, fil
 
 The build anonymously reads GitHub's public repository and latest stable release API, then downloads `SHA256SUMS`. It writes `release.json` with the version, release URL, available supported archive assets and SHA-256 values, and renders the download link directly into HTML. No browser request or GitHub token is required. It rejects drafts, prereleases, incomplete assets and inconsistent hashes. If no public downloadable release exists or GitHub is unavailable, it renders an honest source-install state. Raw source previews retain the source-install button.
 
+The install card links to the `frost` AUR package and shows `yay -S frost`, followed by `frost`. The existing expandable requirements area also covers paru, a manual AUR build, the current Linux archive, and source installation. Archive commands use the same release metadata as the download button so their version stays current.
+
+## Website analytics
+
+The landing page uses the [plain HTML integration for Vercel Web Analytics](https://vercel.com/docs/analytics/quickstart). Its queue and deferred `/_vercel/insights/script.js` script are in `index.html`; no npm package or application dependency is needed. Enable Web Analytics for the Frost project in the Vercel dashboard before redeploying so Vercel adds the analytics routes.
+
+Analytics measures visits to the hosted landing page. The local file manager has no analytics script, and its files and file operations remain local. There are no custom events that send demo searches or filenames.
+
 ## Refresh after a release
 
 In the Vercel project's Settings → Git → Deploy Hooks, create a hook named `Frost stable release` for `main`. Store the full URL as the GitHub repository Actions secret `VERCEL_DEPLOY_HOOK`. Treat this URL as a credential. Never commit it or add it to the website environment.

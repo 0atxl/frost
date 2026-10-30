@@ -1,4 +1,5 @@
-# Preparation only. Source pinned to Frost v0.1.0; AUR submission is separate.
+# Maintainer: 0atxl
+# Source pinned to Frost v0.1.0.
 pkgname=frost
 pkgver=0.1.0
 pkgrel=1

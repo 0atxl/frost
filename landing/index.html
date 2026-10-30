@@ -20,6 +20,12 @@
     <link rel="stylesheet" href="./styles.css?v=preview-clear-1" />
     <script src="./demo.js" defer></script>
     <script type="module" src="./page-vapour.js?v=preview-clear-1"></script>
+    <script>
+      window.va = window.va || function () {
+        (window.vaq = window.vaq || []).push(arguments);
+      };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
     <canvas class="page-vapour" aria-hidden="true" hidden></canvas>
@@ -357,14 +363,14 @@
           </div>
           <div class="install-card">
             <div class="install-card-heading">
-              <span>Install from source</span
+              <span
+                ><a href="https://aur.archlinux.org/packages/frost"
+                  >Arch Linux · AUR ↗</a
+                ></span
               ><button id="copy-install">Copy commands</button>
             </div>
-            <pre><code id="install-commands">git clone https://github.com/0atxl/frost.git
-cd frost
-npm ci
-npm run build
-npm start</code></pre>
+            <pre><code id="install-commands">yay -S frost
+frost</code></pre>
             <div class="install-next">
               Then open <code>http://127.0.0.1:4317</code>
             </div>
@@ -374,9 +380,39 @@ npm start</code></pre>
         <div class="wrap requirements">
           <span>Before you start</span>
           <p>
-            Linux · Node.js 22.13 or later · Python 3 with PyGObject · GIO/GVfs
-            desktop session
+            Linux desktop · Python 3 with PyGObject · GIO/GVfs and user D-Bus.
+            The AUR package installs system dependencies. The Linux archive
+            includes Node.js; source installs need a supported Node.js ≥22.13.
           </p>
+          <details>
+            <summary>Other Arch Linux installation options</summary>
+            <p>
+              With paru, run <code>paru -S frost</code>, then <code>frost</code>.
+            </p>
+            <p>
+              Without an AUR helper, review the PKGBUILD and build as your normal user:
+            </p>
+            <pre><code>git clone https://aur.archlinux.org/frost.git
+cd frost
+makepkg -si
+frost</code></pre>
+          </details>
+          <details>
+            <summary>Install the Linux x64 archive</summary>
+            <!-- release-install -->
+          </details>
+          <details>
+            <summary>Install from source</summary>
+            <pre><code>git clone https://github.com/0atxl/frost.git
+cd frost
+npm ci
+npm run build
+npm start</code></pre>
+            <p>
+              Requires a supported Node.js release ≥22.13, npm, and the desktop
+              dependencies below.
+            </p>
+          </details>
           <details>
             <summary>Desktop dependencies and first launch</summary>
             <p>On Ubuntu or Debian:</p>
@@ -385,7 +421,7 @@ npm start</code></pre>
               gvfs-backends</code
             >
             <p>On Arch Linux:</p>
-            <code>sudo pacman -S python-gobject gvfs</code>
+            <code>sudo pacman -S python python-gobject glib2 gvfs</code>
             <p>
               Run Frost as your normal desktop user. On first launch, create an
               access key. Keep the process running while you use Frost. File
