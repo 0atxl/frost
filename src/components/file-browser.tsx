@@ -69,7 +69,7 @@ const actions: {
   { id: "pin", label: "Pin folder", icon: Star },
   { id: "external", label: "Open in default app", icon: ExternalLink },
   { id: "open-with", label: "Open with…", icon: ExternalLink },
-  { id: "preview", label: "Quick look", icon: ScanEye, shortcut: "Space" },
+  { id: "preview", label: "Quick View", icon: ScanEye, shortcut: "Space" },
   { id: "info", label: "Get info", icon: Info },
   { id: "rename", label: "Rename", icon: Pencil, shortcut: "F2" },
   { id: "copy", label: "Copy", icon: Copy, shortcut: "Ctrl C" },
@@ -115,7 +115,7 @@ function Thumbnail({ file }: { file: FileEntry }) {
         />
       ) : (
         <>
-          <FileIcon kind={file.kind} size={52} />
+          <FileIcon kind={file.kind} size={44} />
         </>
       )}
       {file.isSymlink && (
@@ -138,6 +138,7 @@ function Thumbnail({ file }: { file: FileEntry }) {
 interface Props {
   files: FileEntry[];
   view: "grid" | "list";
+  showKind: boolean;
   selected: Set<string>;
   cutPaths: Set<string>;
   busy: boolean;
@@ -171,6 +172,7 @@ interface Props {
 export function FileBrowser({
   files,
   view,
+  showKind,
   selected,
   cutPaths,
   busy,
@@ -205,7 +207,7 @@ export function FileBrowser({
   const virtualizer = useVirtualizer({
     count: Math.ceil(files.length / columns),
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => (view === "grid" ? 116 : 24),
+    estimateSize: () => (view === "grid" ? 108 : 24),
     overscan: 4,
   });
   useEffect(() => {
@@ -303,7 +305,7 @@ export function FileBrowser({
       style.height = `${next.height}px`;
     }
     const chosen = new Set(state.base);
-    const rowHeight = view === "grid" ? 116 : 24;
+    const rowHeight = view === "grid" ? 108 : 24;
     const top = view === "grid" ? 12 : 4;
     const padding = view === "grid" ? 12 : 6;
     const gap = view === "grid" ? 8 : 0;
@@ -431,7 +433,7 @@ export function FileBrowser({
     <Context.Root>
       <Context.Trigger asChild>
         <section
-          className="file-browser"
+          className={`file-browser${showKind ? " show-kind" : ""}`}
           aria-label="Files"
           onContextMenu={(event) => {
             const location = (event.target as HTMLElement).closest<HTMLElement>(

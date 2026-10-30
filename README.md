@@ -6,7 +6,9 @@
 
 A local browser interface for files on your computer. It opens at Home and can navigate anywhere your user account has access. It requires no browser extension and does not upload files.
 
-The toolbar shows clickable breadcrumbs. Click an ancestor to navigate, or click the current folder or press `/` to edit the full path in place. Enter navigates and Escape cancels. The footer shows the folder name and item count. The sidebar, inspector, and Quick View are optional.
+The toolbar shows clickable breadcrumbs. Click an ancestor to navigate, or click the current folder or press `/` to edit the full path in place. Enter navigates and Escape cancels. View options groups list/grid layouts, sorting, and an optional Kind column. Find files opens search; the separate filter icon narrows the current folder. The footer shows the folder name and item count. The sidebar, inspector, and Quick View are optional. With no file selected, the inspector shows the current folder and item count.
+
+The standalone landing page is in `landing/`. It uses sample files for its interactive demo and runs independently of Frost's local file service.
 
 ## Run locally
 

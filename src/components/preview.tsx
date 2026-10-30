@@ -185,9 +185,11 @@ export function Preview({
   onMediaSize,
   onDetailsChange,
   selectionCount = 0,
+  folder,
   line,
 }: {
   selectionCount?: number;
+  folder?: { name: string; path: string; count: number };
   line?: number;
   file: FileEntry | null;
   onClose?: () => void;
@@ -206,7 +208,7 @@ export function Preview({
   return (
     <section
       className={`preview-panel ${large ? "preview-large" : ""}`}
-      aria-label={large ? "Quick look" : "Inspector"}
+      aria-label={large ? "Quick View" : "Inspector"}
     >
       {large ? (
         <header className="quicklook-header">
@@ -261,7 +263,7 @@ export function Preview({
           <span>Inspector</span>
           <div>
             {file && (
-              <Tip label="Quick look">
+              <Tip label="Quick View">
                 <Button
                   size="icon"
                   aria-label="Expand preview"
@@ -279,10 +281,26 @@ export function Preview({
       )}
       {!file ? (
         <div className="preview-empty">
-          <p>
+          <FileIcon
+            kind={selectionCount > 1 ? "unknown" : "folder"}
+            size={44}
+          />
+          <h3>
             {selectionCount > 1
               ? `${selectionCount} items selected`
-              : "No selection"}
+              : folder?.name || "Inspector"}
+          </h3>
+          {folder && selectionCount < 2 && (
+            <>
+              <p>
+                {folder.count.toLocaleString()}{" "}
+                {folder.count === 1 ? "item" : "items"}
+              </p>
+              <span className="inspector-folder-path">{folder.path}</span>
+            </>
+          )}
+          <p className="inspector-hint">
+            Select a file to see its preview and details.
           </p>
         </div>
       ) : large ? (

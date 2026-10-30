@@ -17,7 +17,6 @@ import {
   ArrowRight,
   ArrowUp,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleAlert,
@@ -30,8 +29,7 @@ import {
   House,
   Image,
   Keyboard,
-  LayoutGrid,
-  List,
+  ListFilter,
   LoaderCircle,
   Moon,
   PanelLeft,
@@ -84,6 +82,7 @@ import { Preview } from "./components/preview";
 import { QuickView } from "./components/quick-view";
 import { ChangeKey } from "./components/change-key";
 import { OpenWithSubmenu } from "./components/open-with";
+import { ViewOptions } from "./components/view-options";
 import { FindPanel } from "./components/find-panel";
 
 interface Pin {
@@ -133,6 +132,9 @@ export function App({
     [view, setView] = useState<"grid" | "list">(() =>
       readStorage("frost:layout-view", "list"),
     );
+  const [showKind, setShowKind] = useState(() =>
+    readStorage("frost:show-kind", false),
+  );
   const [sort, setSort] = useState<SortBy>(() =>
       readStorage("frost:sort", "name"),
     ),
@@ -228,6 +230,7 @@ export function App({
   }, [theme]);
   useEffect(() => {
     writeStorage("frost:layout-view", view);
+    writeStorage("frost:show-kind", showKind);
     writeStorage("frost:sort", sort);
     writeStorage("frost:direction", direction);
     writeStorage("frost:layout-sidebar", sidebar);
@@ -235,7 +238,17 @@ export function App({
     writeStorage("frost:hidden", hidden);
     writeStorage("frost:pins", pins);
     writeStorage("frost:inspector-width", previewWidth);
-  }, [view, sort, direction, sidebar, preview, hidden, pins, previewWidth]);
+  }, [
+    view,
+    showKind,
+    sort,
+    direction,
+    sidebar,
+    preview,
+    hidden,
+    pins,
+    previewWidth,
+  ]);
   useEffect(() => {
     if (!session || !path) return;
     const sequence = ++loadSequence.current,
@@ -1127,100 +1140,24 @@ export function App({
                     <Button
                       size="sm"
                       className="find-button"
+                      aria-label="Find files or contents"
                       onClick={() => setFindOpen(true)}
                     >
                       <Search size={14} />
-                      Find
+                      <span>Find files</span>
+                      <kbd>Ctrl K</kbd>
                     </Button>
                   </Tip>
-                  <div className="view-switch" aria-label="File view">
-                    <Tip label="List view">
-                      <button
-                        aria-label="List view"
-                        aria-pressed={view === "list"}
-                        onClick={() => setView("list")}
-                      >
-                        <List size={15} />
-                      </button>
-                    </Tip>
-                    <Tip label="Grid view">
-                      <button
-                        aria-label="Grid view"
-                        aria-pressed={view === "grid"}
-                        onClick={() => setView("grid")}
-                      >
-                        <LayoutGrid size={15} />
-                      </button>
-                    </Tip>
-                  </div>
-                  <Dropdown.Root>
-                    <Dropdown.Trigger asChild>
-                      <Button
-                        size="sm"
-                        className="sort-button"
-                        aria-label="Sort files"
-                      >
-                        <span>
-                          {
-                            {
-                              name: "Name",
-                              modified: "Date Modified",
-                              size: "Size",
-                              type: "Kind",
-                            }[sort]
-                          }
-                        </span>
-                        <ChevronDown size={12} />
-                      </Button>
-                    </Dropdown.Trigger>
-                    <Dropdown.Portal>
-                      <Dropdown.Content
-                        className="menu"
-                        align="end"
-                        sideOffset={6}
-                      >
-                        <Dropdown.Label className="menu-label">
-                          Sort by
-                        </Dropdown.Label>
-                        {(["name", "modified", "size", "type"] as SortBy[]).map(
-                          (column) => (
-                            <Dropdown.Item
-                              key={column}
-                              className="menu-item"
-                              onSelect={() => onSort(column)}
-                            >
-                              <span>
-                                {
-                                  {
-                                    name: "Name",
-                                    modified: "Date Modified",
-                                    size: "Size",
-                                    type: "Kind",
-                                  }[column]
-                                }
-                              </span>
-                              {sort === column && <Check size={14} />}
-                            </Dropdown.Item>
-                          ),
-                        )}
-                        <Dropdown.Separator className="menu-separator" />
-                        <Dropdown.Item
-                          className="menu-item"
-                          onSelect={() => setDirection("asc")}
-                        >
-                          <span>Ascending</span>
-                          {direction === "asc" && <Check size={14} />}
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          className="menu-item"
-                          onSelect={() => setDirection("desc")}
-                        >
-                          <span>Descending</span>
-                          {direction === "desc" && <Check size={14} />}
-                        </Dropdown.Item>
-                      </Dropdown.Content>
-                    </Dropdown.Portal>
-                  </Dropdown.Root>
+                  <ViewOptions
+                    view={view}
+                    onViewChange={setView}
+                    sort={sort}
+                    onSort={onSort}
+                    direction={direction}
+                    onDirectionChange={setDirection}
+                    showKind={showKind}
+                    onShowKindChange={setShowKind}
+                  />
                 </>
               )}
               <Dropdown.Root
@@ -1540,7 +1477,7 @@ export function App({
                   </Tip>
                   {searchOpen || query ? (
                     <div className="search-input">
-                      <Search size={14} />
+                      <ListFilter size={14} />
                       <input
                         autoFocus
                         ref={searchRef}
@@ -1585,7 +1522,7 @@ export function App({
                           );
                         }}
                       >
-                        <Search />
+                        <ListFilter />
                       </Button>
                     </Tip>
                   )}
@@ -1706,6 +1643,7 @@ export function App({
                     key={listing?.path || path}
                     files={visible}
                     view={view}
+                    showKind={showKind}
                     selected={selected}
                     cutPaths={cutPaths}
                     busy={!!busy}
@@ -1781,6 +1719,15 @@ export function App({
                     <Preview
                       file={focusedFile}
                       selectionCount={selected.size}
+                      folder={
+                        listing
+                          ? {
+                              name: title,
+                              path: shortenPath(currentPath, session.home),
+                              count: listing.entries.length,
+                            }
+                          : undefined
+                      }
                       onClose={() => setPreview(false)}
                       onExpand={() => focusedFile && setQuickLook(focusedFile)}
                       onOpen={go}
