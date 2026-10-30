@@ -6,6 +6,7 @@ pkgdesc='Local browser file manager for Linux desktops'
 arch=('x86_64')
 url='https://github.com/0atxl/frost'
 license=('MIT')
+options=('!debug')
 depends=('nodejs>=22.13' 'python' 'python-gobject' 'glib2' 'gvfs' 'dbus' 'libvips')
 makedepends=('git' 'npm' 'node-gyp' 'pkgconf')
 optdepends=('gvfs-smb: SMB shares')
@@ -39,6 +40,11 @@ build() {
   export npm_config_nodedir=/usr
   export NODE_PATH="$srcdir:/usr/share/nodejs:/usr/lib/node_modules"
   node-gyp rebuild --directory=src
+  # Retain the loadable addon, not compiler objects, Makefiles or build paths.
+  install -m755 src/build/Release/*.node "$srcdir/sharp-native.node"
+  _native_name=$(basename src/build/Release/*.node)
+  rm -rf src/build
+  install -Dm755 "$srcdir/sharp-native.node" "src/build/Release/$_native_name"
   rm -rf "$srcdir/runtime/node_modules/@img"/sharp-linux* "$srcdir/runtime/node_modules/@img"/sharp-libvips-*
 }
 

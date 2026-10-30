@@ -27,13 +27,21 @@ jobs:
       - name: Inspect installed contents and system libvips linkage
         run: |
           mkdir /tmp/frost-installed
-          bsdtar -xf /tmp/frost-aur/frost-*.pkg.tar.zst -C /tmp/frost-installed
+          archive=$(find /tmp/frost-aur -maxdepth 1 -name 'frost-[0-9]*-x86_64.pkg.tar.zst')
+          bsdtar -xf "$archive" -C /tmp/frost-installed
           if find /tmp/frost-installed/usr -name .frost-data -o -name .agent-notes -o -name access.json -o -name .env | grep .; then exit 1; fi
           test ! -e /tmp/frost-installed/usr/lib/frost/runtime/bin/node
           test ! -e /tmp/frost-installed/usr/lib/frost/node_modules/@img/sharp-libvips-linux-x64
           ldd /tmp/frost-installed/usr/lib/frost/node_modules/sharp/src/build/Release/*.node | tee /tmp/frost-aur/linkage.txt
           grep 'libvips-cpp.so.* /usr/lib/' /tmp/frost-aur/linkage.txt
           if grep 'not found' /tmp/frost-aur/linkage.txt; then exit 1; fi
+          node --input-type=module <<'JS'
+          import { createRequire } from 'node:module';
+          const require = createRequire('/tmp/frost-installed/usr/lib/frost/package.json');
+          const sharp = require('sharp');
+          await sharp({create:{width:8,height:8,channels:3,background:'red'}}).webp().toBuffer();
+          console.log('Installed Sharp loads with system Node and libvips.');
+          JS
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: frost-aur-preparation
