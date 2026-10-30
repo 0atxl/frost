@@ -40,14 +40,16 @@ export async function latestRelease(request = fetch) {
       hashes.set(match[2], match[1]);
     }
     const downloads = assets.filter((asset) =>
-      asset.name === `frost-${version}-linux-x64.tar.gz` && hashes.has(asset.name)
+      [ `frost-${version}-linux-x64.tar.gz`, `frost-${version}-source.tar.gz` ].includes(asset.name) && hashes.has(asset.name)
     ).map((asset) => {
       const sha256 = hashes.get(asset.name);
       if (asset.digest && asset.digest !== `sha256:${sha256}`) throw new Error("Checksum mismatch");
+      const binary = asset.name.endsWith("-linux-x64.tar.gz");
       return { name: asset.name, url: asset.browser_download_url, size: asset.size,
-        platform: "linux-x64", baseline: "Ubuntu 22.04 x64 / glibc 2.35 or later", sha256 };
+        platform: binary ? "linux-x64" : "source",
+        baseline: binary ? "Ubuntu 22.04 x64 / glibc 2.35 or later / SSE4.2" : null, sha256 };
     });
-    if (!downloads.length) return unavailable("no-downloadable-release");
+    if (!downloads.some((asset) => asset.platform === "linux-x64")) return unavailable("no-downloadable-release");
     return { available: true, version, releaseUrl, sourceUrl: github,
       assets: downloads, checksums: { url: sums.browser_download_url, values: Object.fromEntries(hashes) } };
   } catch {
@@ -60,12 +62,12 @@ const escape = (value) => String(value).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 export function releaseHtml(html, release) {
-  const download = release.assets[0];
+  const download = release.assets.find((asset) => asset.platform === "linux-x64");
   const button = release.available
     ? `href="${escape(download.url)}">Download for Linux x64`
     : 'href="#install">Install from source';
   const note = release.available
-    ? `Frost ${escape(release.version)} for Linux x64. Ubuntu 22.04 / glibc 2.35 or later. Node.js is included. ` +
+    ? `Frost ${escape(release.version)} for Linux x64 with SSE4.2. Ubuntu 22.04 / glibc 2.35 or later. Node.js is included. ` +
       `<a href="${escape(release.releaseUrl)}">Release notes</a> · <a href="${escape(release.checksums.url)}">SHA-256 checksums</a>`
     : 'No public binary download is available right now. Install from the public source repository below.';
   return html.replaceAll('href="#install" data-release-button>Install from source', button)

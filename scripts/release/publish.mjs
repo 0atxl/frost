@@ -20,7 +20,7 @@ async function api(url, options = {}) {
   if (!response.ok) throw new Error(`Release request failed: HTTP ${response.status}`);
   return response.json();
 }
-const notes = `Frost ${version} for Linux x64\n\nBuilt from ${commit} on Ubuntu 22.04, glibc 2.35. Bundles Node.js 24 and production dependencies. Requires system Python 3, PyGObject, GIO/GVfs and a desktop D-Bus session. See INSTALL.md in the archive. Verify downloads with SHA256SUMS. No automatic updates.\n\n<!-- frost-release-commit:${commit} -->`;
+const notes = `Frost ${version} for Linux x64\n\nBuilt from ${commit} on Ubuntu 22.04, glibc 2.35. Requires an x86-64 CPU with SSE4.2. Bundles Node.js 24 and production dependencies. Requires system Python 3, PyGObject, GIO/GVfs and a desktop D-Bus session. See INSTALL.md in the archive. Verify downloads with SHA256SUMS. No automatic updates.\n\n<!-- frost-release-commit:${commit} -->`;
 const known = await fetch(`${root}/releases/tags/${tag}`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30_000) });
 let release;
 if (known.status === 404) {

@@ -14,7 +14,7 @@ tar -xzf frost-0.1.0-linux-x64.tar.gz
 
 Open `http://127.0.0.1:4317`. Run as your normal desktop user. The launcher refuses root and keeps running until Ctrl+C. It resolves its installation through symlinks and can start from another directory. It does not need npm or a system Node installation. It serves the compiled local UI and binds only to `127.0.0.1`.
 
-The archive targets Linux x86-64 with glibc 2.35 or later, kernel 4.18 or later, and libstdc++. It builds on Ubuntu 22.04 and is exercised on Ubuntu 22.04 and 24.04. Other distributions with those libraries may work but are not covered by these jobs. ARM, musl/Alpine, Windows and macOS packages are not supplied. This is not a universal Linux binary. The official Node runtime has its own [platform requirements](https://github.com/nodejs/node/blob/v24.x/BUILDING.md#supported-platforms).
+The archive targets Linux x86-64 CPUs with SSE4.2, glibc 2.35 or later, kernel 4.18 or later, and libstdc++. It builds on Ubuntu 22.04 and is exercised on Ubuntu 22.04 and 24.04. Other distributions with those libraries may work but are not covered by these jobs. ARM, musl/Alpine, Windows and macOS packages are not supplied. This is not a universal Linux binary. See the official [Node platform requirements](https://github.com/nodejs/node/blob/v24.x/BUILDING.md#supported-platforms) and [Sharp CPU requirements](https://sharp.pixelplumbing.com/install/#prebuilt-binaries).
 
 The archive bundles the pinned Node 24 LTS version in `scripts/release/node.env`, the frontend, compiled backend, `desktop.py`, production npm dependencies, and matching Sharp Linux x64/glibc and libvips native modules. Pin updates require a new release, checksum review, and remote package verification.
 

@@ -46,7 +46,7 @@ Frost $version
 Commit: $commit
 Node: $NODE_VERSION
 Build baseline: Ubuntu 22.04 x64, glibc 2.35
-Runtime baseline: Linux x86-64, glibc >= 2.35, kernel >= 4.18, libstdc++
+Runtime baseline: Linux x86-64 with SSE4.2, glibc >= 2.35, kernel >= 4.18, libstdc++
 Desktop dependencies: system Python 3, PyGObject, GIO, GVfs, session D-Bus
 EOF
 tar -czf "$output/$name.tar.gz" -C "$stage" "$name"
