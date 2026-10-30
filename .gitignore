@@ -31,3 +31,5 @@ credentials.local.*
 *.p12
 *.pfx
 coverage/
+.vercel/
+release-output/

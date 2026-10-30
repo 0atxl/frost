@@ -1,0 +1,33 @@
+name: Website redeploy
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-refresh
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Request a fresh Git-integrated Vercel build
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [[ -z "$VERCEL_DEPLOY_HOOK" ]]; then
+            echo '::error::Set the VERCEL_DEPLOY_HOOK Actions secret, then run Website redeploy. The release is already published.'
+            exit 1
+          fi
+          # Treat the hook URL as a credential. Never echo it or its response.
+          if ! curl --fail --silent --show-error --retry 3 --max-time 60 \
+            --request POST --output /dev/null "$VERCEL_DEPLOY_HOOK"; then
+            echo '::error::Vercel rejected the deployment request. Inspect Vercel and rerun Website redeploy.'
+            exit 1
+          fi
+          echo 'Vercel accepted a deployment request. Inspect its build result in Vercel.'

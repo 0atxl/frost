@@ -114,7 +114,7 @@
             preview. Your files stay on your computer.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#install">Install Frost</a
+            <a class="button primary" href="#install" data-release-button>Install from source</a
             ><a class="button secondary" href="#demo"
               >Try the preview <span aria-hidden="true">↓</span></a
             >
@@ -349,8 +349,7 @@
             <h2 id="install-title">Open a window.<br />Find the file.</h2>
             <p>Run Frost locally, then open it in your browser.</p>
             <p class="access-note">
-              The repository is currently private. These instructions work for
-              people with repository access.
+              <!-- release-status -->
             </p>
             <a class="repo-link" href="https://github.com/0atxl/frost"
               >Star on GitHub <span aria-hidden="true">↗</span></a
@@ -361,7 +360,7 @@
               <span>Install from source</span
               ><button id="copy-install">Copy commands</button>
             </div>
-            <pre><code id="install-commands">git clone git@github.com:0atxl/frost.git
+            <pre><code id="install-commands">git clone https://github.com/0atxl/frost.git
 cd frost
 npm ci
 npm run build
@@ -429,7 +428,7 @@ npm start</code></pre>
         ><svg><use href="#snow" /></svg>Frost</a
       ><span>A local file manager for Linux.</span
       ><a href="https://github.com/0atxl/frost"
-        >Star on GitHub <span class="private-label">Private</span> ↗</a
+        >Star on GitHub ↗</a
       >
     </footer>
   </body>
