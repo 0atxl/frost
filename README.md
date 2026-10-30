@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/0atxl/frost/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/0atxl/frost/actions/workflows/ci.yml)
 
-[Repository](https://github.com/0atxl/frost), private. GitHub access is required to clone it and view its Actions runs.
+[Repository](https://github.com/0atxl/frost) · [CI runs](https://github.com/0atxl/frost/actions)
 
 A local browser interface for files on your computer. It opens at Home and can navigate anywhere your user account has access. It requires no browser extension and does not upload files.
 
@@ -16,10 +16,10 @@ Requires Linux, a supported Node.js release satisfying `>=22.13`, npm, Python 3 
 
 On Ubuntu/Debian, install desktop dependencies with `sudo apt install python3-gi gir1.2-glib-2.0 gvfs gvfs-backends`. On Arch Linux, use `sudo pacman -S python-gobject gvfs`. Run inside your normal graphical desktop session with its session D-Bus available.
 
-Clone using SSH with a key registered to a GitHub account that has repository access:
+Clone the repository:
 
 ```sh
-git clone git@github.com:0atxl/frost.git
+git clone https://github.com/0atxl/frost.git
 cd frost
 npm ci
 npm run build
@@ -135,4 +135,4 @@ Earlier private Trash contents remain under `FROST_DATA_DIR/trash`. They are inc
 
 The [CI workflow](https://github.com/0atxl/frost/actions/workflows/ci.yml) runs the complete `npm test` suite and `npm run build`, including TypeScript compilation, on GitHub-hosted Ubuntu runners for pushes, pull requests, and manual dispatches. Tests use temporary filesystem fixtures. GIO Trash coverage runs in a private D-Bus session with isolated XDG state. Lock, Find, and thumbnail tests cover server behavior and browser-cache logic without launching a browser.
 
-CI does not validate attached drives, SSHFS mounts, graphical application launching, browser interactions, or media codec support. Check these manually in your desktop session before a release. After a passing run, review the changes and coverage limits, tag the chosen commit, and create a private GitHub release if needed. Install or update locally with `npm ci`, `npm run build`, and `npm start`; stop the existing process before restarting. Frost stays on loopback and has no GitHub Pages deployment.
+CI does not validate attached drives, SSHFS mounts, graphical application launching, browser interactions, or media codec support. Check these manually in your desktop session before a release. After a passing run, review the changes and coverage limits, tag the chosen commit, and create a GitHub release if needed. Install or update locally with `npm ci`, `npm run build`, and `npm start`; stop the existing process before restarting. Frost stays on loopback and has no GitHub Pages deployment.
