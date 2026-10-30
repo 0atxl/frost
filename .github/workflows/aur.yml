@@ -1,0 +1,47 @@
+name: AUR preparation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    timeout-minutes: 20
+    steps:
+      - name: Install Arch system and build dependencies
+        run: pacman -Syu --noconfirm --needed git nodejs npm node-gyp pkgconf vips python python-gobject glib2 gvfs dbus
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build the prepared recipe as a normal user
+        run: |
+          useradd --create-home builder
+          mkdir /tmp/frost-aur
+          cp packaging/aur/PKGBUILD /tmp/frost-aur/
+          chown -R builder:builder /tmp/frost-aur
+          runuser -u builder -- bash -c 'cd /tmp/frost-aur && makepkg --noconfirm && makepkg --printsrcinfo > .SRCINFO'
+      - name: Inspect installed contents and system libvips linkage
+        run: |
+          mkdir /tmp/frost-installed
+          bsdtar -xf /tmp/frost-aur/frost-*.pkg.tar.zst -C /tmp/frost-installed
+          if find /tmp/frost-installed/usr -name .frost-data -o -name .agent-notes -o -name access.json -o -name .env | grep .; then exit 1; fi
+          test ! -e /tmp/frost-installed/usr/lib/frost/runtime/bin/node
+          test ! -e /tmp/frost-installed/usr/lib/frost/node_modules/@img/sharp-libvips-linux-x64
+          ldd /tmp/frost-installed/usr/lib/frost/node_modules/sharp/src/build/Release/*.node | tee /tmp/frost-aur/linkage.txt
+          grep 'libvips-cpp.so.* /usr/lib/' /tmp/frost-aur/linkage.txt
+          if grep 'not found' /tmp/frost-aur/linkage.txt; then exit 1; fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frost-aur-preparation
+          path: |
+            /tmp/frost-aur/*.pkg.tar.zst
+            /tmp/frost-aur/PKGBUILD
+            /tmp/frost-aur/.SRCINFO
+            /tmp/frost-aur/linkage.txt
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
