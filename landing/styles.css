@@ -187,6 +187,10 @@ button:disabled {
      supplies its refracted appearance only while a trail is visible. */
   opacity: 0;
 }
+.vapour-active #app-demo {
+  /* The preview keeps its real HTML visible above the effect. */
+  opacity: 1;
+}
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
   .page-vapour {
     display: none;
@@ -291,6 +295,8 @@ button:disabled {
   --folder-stroke: #4c9cdb;
   display: flex;
   position: relative;
+  /* The opaque preview covers the vapour canvas at z-index 8. */
+  z-index: 9;
   height: 388px;
   background: var(--app-bg);
   color: var(--app-text);

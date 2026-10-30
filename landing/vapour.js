@@ -1,4 +1,4 @@
-import { vertex, simulation, blur, display } from "./vapour-shaders.js";
+import { vertex, simulation, blur, display } from "./vapour-shaders.js?v=preview-clear-1";
 
 export function mountVapour(canvas, options = {}) {
   const host = options.host || document.documentElement;

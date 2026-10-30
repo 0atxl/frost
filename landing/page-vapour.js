@@ -23,8 +23,8 @@ if (canvas) {
     try {
       // Touch and reduced-motion visitors don't download or initialize WebGL.
       const [{ mountVapour }, { createPageScene }] = await Promise.all([
-        import("./vapour.js"),
-        import("./page-scene.js"),
+        import("./vapour.js?v=preview-clear-1"),
+        import("./page-scene.js?v=preview-clear-1"),
         document.fonts.ready,
       ]);
       if (current !== generation) return;

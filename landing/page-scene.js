@@ -1,4 +1,4 @@
-// A renderer for this landing page's text and sample-file demo. It uses the
+// A renderer for this landing page's hero text. It uses the
 // live layout/styles; no screenshots, remote assets or page-capture library.
 export function createPageScene(host, canvas) {
   const source = document.createElement("canvas");
@@ -340,7 +340,10 @@ export function createPageScene(host, canvas) {
     ).backgroundColor.match(/[\d.]+/g);
     if (rgb?.length >= 3)
       for (let i = 0; i < 3; i++) background[i] = Number(rgb[i]) / 255;
-    for (const element of elements) paint(element, true);
+    // Keep observing the preview for layout and interaction changes, but
+    // never copy its rows or icons into the refracted scene.
+    for (const element of elements)
+      if (element !== demo) paint(element, true);
     return source;
   }
 
