@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Install Arch system and build dependencies
-        run: pacman -Syu --noconfirm --needed git nodejs npm node-gyp pkgconf vips python python-gobject glib2 gvfs dbus
+        run: pacman -Syu --noconfirm --needed git nodejs npm node-gyp pkgconf libvips python python-gobject glib2 gvfs dbus
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false

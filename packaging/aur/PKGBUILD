@@ -6,7 +6,7 @@ pkgdesc='Local browser file manager for Linux desktops'
 arch=('x86_64')
 url='https://github.com/0atxl/frost'
 license=('MIT')
-depends=('nodejs>=22.13' 'python' 'python-gobject' 'glib2' 'gvfs' 'dbus' 'vips')
+depends=('nodejs>=22.13' 'python' 'python-gobject' 'glib2' 'gvfs' 'dbus' 'libvips')
 makedepends=('git' 'npm' 'node-gyp' 'pkgconf')
 optdepends=('gvfs-smb: SMB shares')
 _commit=581218f09fa23d247566862f698ea1cdf783ada2
