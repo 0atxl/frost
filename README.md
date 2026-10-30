@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/0atxl/frost/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/0atxl/frost/actions/workflows/ci.yml)
 
-[Website](https://frost-sigma-eosin.vercel.app) · [Downloads](https://github.com/0atxl/frost/releases/latest) · [Repository](https://github.com/0atxl/frost) · [CI runs](https://github.com/0atxl/frost/actions)
+[Website](https://getfrost.vercel.app) · [Downloads](https://github.com/0atxl/frost/releases/latest) · [Repository](https://github.com/0atxl/frost) · [CI runs](https://github.com/0atxl/frost/actions)
 
 A local browser interface for files on your computer. It opens at Home and can navigate anywhere your user account has access. It requires no browser extension and does not upload files.
 
