@@ -48,7 +48,9 @@ export function QuickView({
   const maxWidth = Math.min(viewport.width - 24, viewport.width * 0.9),
     maxHeight = viewport.height * 0.88;
   const visual = file?.kind === "image" || file?.kind === "video";
-  const measured = visual && media?.path === file?.path ? media : null;
+  // Retain the displayed media's dimensions until its replacement is ready.
+  // ImagePreview promotes the decoded image in the same update as onMediaSize.
+  const measured = visual ? media : null;
   const panelWidth = details ? Math.min(250, maxWidth * 0.35) : 0;
   const scale = measured
     ? Math.min(

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useLayoutEffect, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,6 +16,7 @@ import { Button } from "./ui/button";
 import { Tip } from "./ui/tooltip";
 import { FileIcon } from "./file-icon";
 import { OpenWithButton } from "./open-with";
+import { ImagePreview } from "./image-preview";
 const PdfPreview = lazy(() => import("./pdf-preview"));
 const TextContent = lazy(() => import("./text-preview"));
 
@@ -32,12 +33,15 @@ function Content({
   file: FileEntry;
   onOpen: (path: string) => void;
 }) {
-  const [failed, setFailed] = useState(false),
-    [asText, setAsText] = useState(false);
-  useEffect(() => {
-    setFailed(false);
-    setAsText(false);
-  }, [file.path, file.modified]);
+  const identity = `${file.path}\0${file.modified}\0${file.size}`;
+  const [failedFile, setFailedFile] = useState<string | null>(null),
+    [textFile, setTextFile] = useState<string | null>(null);
+  const failed = failedFile === identity,
+    asText = textFile === identity;
+  useLayoutEffect(() => {
+    setFailedFile(null);
+    setTextFile(null);
+  }, [identity]);
   if (!file.accessible)
     return (
       <div className="unsupported">
@@ -59,19 +63,11 @@ function Content({
     );
   if (file.kind === "image" && !failed)
     return (
-      <div className="image-preview">
-        <img
-          src={fileUrl(file)}
-          alt={file.name}
-          onLoad={(event) =>
-            onMediaSize?.(
-              event.currentTarget.naturalWidth,
-              event.currentTarget.naturalHeight,
-            )
-          }
-          onError={() => setFailed(true)}
-        />
-      </div>
+      <ImagePreview
+        file={file}
+        onReady={onMediaSize}
+        onError={() => setFailedFile(identity)}
+      />
     );
   if (file.kind === "pdf")
     return (
@@ -90,6 +86,7 @@ function Content({
     return (
       <div className="video-preview">
         <video
+          key={identity}
           controls
           preload="metadata"
           playsInline
@@ -100,7 +97,7 @@ function Content({
             )
           }
           src={fileUrl(file)}
-          onError={() => setFailed(true)}
+          onError={() => setFailedFile(identity)}
         />
       </div>
     );
@@ -111,10 +108,11 @@ function Content({
           <Music2 size={50} strokeWidth={1} />
         </div>
         <audio
+          key={identity}
           controls
           preload="metadata"
           src={fileUrl(file)}
-          onError={() => setFailed(true)}
+          onError={() => setFailedFile(identity)}
         />
       </div>
     );
@@ -141,7 +139,7 @@ function Content({
         {failed ? "This format could not be displayed" : "Preview unavailable"}
       </strong>
       {failed && <p>Your browser may not support this format.</p>}
-      <Button variant="outline" size="sm" onClick={() => setAsText(true)}>
+      <Button variant="outline" size="sm" onClick={() => setTextFile(identity)}>
         Try as text
       </Button>
     </div>

@@ -834,6 +834,14 @@
     max-height: 190px;
     object-fit: contain;
   }
+  .image-preview-staged {
+    position: relative;
+  }
+  .image-preview-staged .image-pending {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
   .folder-preview {
     display: flex;
     flex-direction: column;
