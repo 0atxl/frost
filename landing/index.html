@@ -19,8 +19,10 @@
     />
     <link rel="stylesheet" href="./styles.css" />
     <script src="./demo.js" defer></script>
+    <script type="module" src="./page-vapour.js"></script>
   </head>
   <body>
+    <canvas class="page-vapour" aria-hidden="true" hidden></canvas>
     <svg
       class="icon-library"
       xmlns="http://www.w3.org/2000/svg"
@@ -101,22 +103,26 @@
     </header>
     <main id="main">
       <section class="hero wrap" id="top">
-        <p class="eyebrow"><span></span> For Linux today. On your machine.</p>
-        <h1>
-          Your files, in a<br class="desktop-break" />
-          quieter window.
-        </h1>
-        <p class="hero-description">
-          A compact file manager, in your browser.<br />Browse, find, and
-          preview. Your files stay on your computer.
-        </p>
-        <div class="hero-actions">
-          <a class="button primary" href="#install">Install Frost</a
-          ><a class="button secondary" href="#demo"
-            >Try the preview <span aria-hidden="true">↓</span></a
-          >
+        <div class="hero-content">
+          <p class="eyebrow"><span></span> For Linux today. On your machine.</p>
+          <h1 data-vapour-text>
+            Your files, in a<br class="desktop-break" />
+            quieter window.
+          </h1>
+          <p class="hero-description" data-vapour-text>
+            A compact file manager, in your browser.<br />Browse, find, and
+            preview. Your files stay on your computer.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#install">Install Frost</a
+            ><a class="button secondary" href="#demo"
+              >Try the preview <span aria-hidden="true">↓</span></a
+            >
+          </div>
+          <p class="hero-note">
+            Local files. No uploads. No browser extension.
+          </p>
         </div>
-        <p class="hero-note">Local files. No uploads. No browser extension.</p>
       </section>
 
       <section class="demo-section wrap" id="demo" aria-labelledby="demo-title">
@@ -134,6 +140,7 @@
         <div
           class="app-demo"
           id="app-demo"
+          data-vapour-scene
           aria-label="Interactive Frost demo with sample files"
         >
           <aside class="demo-sidebar" aria-label="Demo folders">

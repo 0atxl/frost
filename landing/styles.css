@@ -164,8 +164,46 @@ button:disabled {
   font-size: 13px;
 }
 .hero {
+  position: relative;
+  isolation: isolate;
   text-align: center;
   padding-top: 72px;
+}
+.page-vapour {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+.vapour-active [data-vapour-text],
+.vapour-active [data-vapour-scene] {
+  /* Keep the real text in layout and the accessibility tree. The canvas
+     supplies its refracted appearance only while a trail is visible. */
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .page-vapour {
+    display: none;
+  }
+  .vapour-active [data-vapour-text],
+  .vapour-active [data-vapour-scene] {
+    opacity: 1;
+  }
+}
+@media print {
+  .page-vapour {
+    display: none;
+  }
+  .vapour-active [data-vapour-text],
+  .vapour-active [data-vapour-scene] {
+    opacity: 1;
+  }
 }
 .eyebrow {
   margin: 0 0 20px;
