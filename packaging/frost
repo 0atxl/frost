@@ -1,0 +1,46 @@
+#!/bin/sh
+set -eu
+
+if [ "$(id -u)" -eq 0 ]; then
+  echo 'Run Frost as your normal desktop user, without sudo.' >&2
+  exit 1
+fi
+
+# Linux readlink resolves launchers installed through symlinks, too.
+frost_launcher=$(readlink -f -- "$0")
+frost_install=$(dirname -- "$frost_launcher")
+if [ -f "$frost_install/build/server/index.js" ]; then
+  frost_assets=$frost_install
+  frost_node=$frost_install/runtime/bin/node
+else
+  frost_assets=/usr/lib/frost
+  frost_node=/usr/bin/node
+fi
+
+# Resolve state before changing directories. Never migrate or delete old data.
+if [ -n "${FROST_DATA_DIR:-}" ]; then
+  FROST_DATA_DIR=$(realpath -m -- "$FROST_DATA_DIR")
+elif [ -d "$PWD/.frost-data" ]; then
+  FROST_DATA_DIR=$PWD/.frost-data
+elif [ -d "$frost_assets/.frost-data" ]; then
+  FROST_DATA_DIR=$frost_assets/.frost-data
+else
+  : "${HOME:?A home directory is required}"
+  frost_data_base=${XDG_DATA_HOME:-$HOME/.local/share}
+  case "$frost_data_base" in
+    /*) ;;
+    *) echo 'XDG_DATA_HOME must be an absolute path.' >&2; exit 1 ;;
+  esac
+  FROST_DATA_DIR=$frost_data_base/frost
+fi
+umask 077
+mkdir -p -- "$FROST_DATA_DIR"
+if [ ! -w "$FROST_DATA_DIR" ]; then
+  echo "Frost state is not writable: $FROST_DATA_DIR" >&2
+  exit 1
+fi
+export FROST_DATA_DIR
+# The installed package always serves its compiled UI. The server binds 127.0.0.1.
+unset FROST_DEV
+cd -- "$frost_assets"
+exec "$frost_node" "$frost_assets/build/server/index.js" "$@"
