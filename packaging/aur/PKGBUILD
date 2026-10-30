@@ -7,12 +7,14 @@ arch=('x86_64')
 url='https://github.com/0atxl/frost'
 license=('MIT')
 depends=('nodejs>=22.13' 'python' 'python-gobject' 'glib2' 'gvfs' 'dbus' 'vips')
-makedepends=('git' 'npm' 'node-gyp' 'node-addon-api' 'pkgconf')
-optdepends=('gvfs-smb: SMB shares' 'gvfs-mtp: desktop MTP support')
+makedepends=('git' 'npm' 'node-gyp' 'pkgconf')
+optdepends=('gvfs-smb: SMB shares')
 _commit=RELEASE_COMMIT
-source=("frost::git+https://github.com/0atxl/frost.git#commit=${_commit}")
+_addon_commit=6babc960154752f686a7dca8e712991a976a754b
+source=("frost::git+https://github.com/0atxl/frost.git#commit=${_commit}"
+        "node-addon-api::git+https://github.com/nodejs/node-addon-api.git#commit=${_addon_commit}")
 # Git sources use a full immutable commit rather than an unverified moving tag.
-sha256sums=('SKIP')
+sha256sums=('SKIP' 'SKIP')
 
 prepare() {
   cd "$srcdir/frost"
@@ -35,7 +37,7 @@ build() {
   # No bundled Node or prebuilt libvips is installed by this package.
   export SHARP_FORCE_GLOBAL_LIBVIPS=1
   export npm_config_nodedir=/usr
-  export NODE_PATH=/usr/share/nodejs:/usr/lib/node_modules
+  export NODE_PATH="$srcdir:/usr/share/nodejs:/usr/lib/node_modules"
   node-gyp rebuild --directory=src
   rm -rf "$srcdir/runtime/node_modules/@img"/sharp-linux* "$srcdir/runtime/node_modules/@img"/sharp-libvips-*
 }

@@ -30,12 +30,14 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm ci --prefix "$package" --omit=dev --include=op
 "$package/runtime/bin/node" --input-type=module - "$package" <<'JS'
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 const require = createRequire(process.argv[2] + '/package.json');
 const sharp = require('sharp');
-const metadata = require('sharp/package.json');
-assert.equal(require('@img/sharp-linux-x64/package.json').version,
+const metadataAt = (name) => JSON.parse(readFileSync(process.argv[2] + '/node_modules/' + name + '/package.json', 'utf8'));
+const metadata = metadataAt('sharp');
+assert.equal(metadataAt('@img/sharp-linux-x64').version,
   metadata.optionalDependencies['@img/sharp-linux-x64']);
-assert.equal(require('@img/sharp-libvips-linux-x64/package.json').version,
+assert.equal(metadataAt('@img/sharp-libvips-linux-x64').version,
   metadata.optionalDependencies['@img/sharp-libvips-linux-x64']);
 await sharp({create:{width:8,height:8,channels:3,background:'red'}}).webp().toBuffer();
 JS
