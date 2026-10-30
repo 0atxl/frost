@@ -296,6 +296,34 @@
       openFind();
     }
   });
+  const installTabs = [...document.querySelectorAll('.install-tabs [role="tab"]')];
+  const copyInstall = document.getElementById("copy-install");
+  function selectInstallTab(selected) {
+    installTabs.forEach((tab) => {
+      const active = tab === selected;
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    copyInstall.hidden = selected.id !== "install-arch-tab";
+    copyInstall.textContent = "Copy";
+    document.getElementById("copy-status").textContent = "";
+  }
+  installTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => selectInstallTab(tab));
+    tab.addEventListener("keydown", (event) => {
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % installTabs.length;
+      else if (event.key === "ArrowLeft")
+        next = (index + installTabs.length - 1) % installTabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = installTabs.length - 1;
+      else return;
+      event.preventDefault();
+      selectInstallTab(installTabs[next]);
+      installTabs[next].focus();
+    });
+  });
   document
     .getElementById("copy-install")
     .addEventListener("click", async (event) => {

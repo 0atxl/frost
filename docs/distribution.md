@@ -24,7 +24,7 @@ Open `http://127.0.0.1:4317` and keep the process running. When switching from a
 
 ## Linux x64 archive
 
-Download the archive and `SHA256SUMS` from the same [stable release](https://github.com/0atxl/frost/releases/latest). Verify before extracting:
+Download the archive and `SHA256SUMS` from the same [stable release](https://github.com/0atxl/frost/releases/latest). The commands below use `0.1.0` as an example; substitute the version you downloaded. Verify before extracting:
 
 ```sh
 sha256sum --ignore-missing --check SHA256SUMS
@@ -37,6 +37,20 @@ Open `http://127.0.0.1:4317`. Run as your normal desktop user. The launcher refu
 The archive targets Linux x86-64 CPUs with SSE4.2, glibc 2.35 or later, kernel 4.18 or later, and libstdc++. It builds on Ubuntu 22.04 and is exercised on Ubuntu 22.04 and 24.04. Other distributions with those libraries may work but are not covered by these jobs. ARM, musl/Alpine, Windows and macOS packages are not supplied. This is not a universal Linux binary. See the official [Node platform requirements](https://github.com/nodejs/node/blob/v24.x/BUILDING.md#supported-platforms) and [Sharp CPU requirements](https://sharp.pixelplumbing.com/install/#prebuilt-binaries).
 
 The archive bundles the pinned Node 24 LTS version in `scripts/release/node.env`, the frontend, compiled backend, `desktop.py`, production npm dependencies, and matching Sharp Linux x64/glibc and libvips native modules. Pin updates require a new release, checksum review, and remote package verification.
+
+## Install from source
+
+Install the desktop dependencies below and a supported Node.js release satisfying `>=22.13`, with npm. Then run:
+
+```sh
+git clone https://github.com/0atxl/frost.git
+cd frost
+npm ci
+npm run build
+npm start
+```
+
+Open `http://127.0.0.1:4317`. On first launch, create an access key of at least four characters. Keep the process running while using Frost. The key locks browser access to Frost; it does not encrypt files or replace the operating-system lock. File operations affect the actual files on your computer.
 
 ## External desktop requirements
 

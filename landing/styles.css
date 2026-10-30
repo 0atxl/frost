@@ -849,8 +849,7 @@ kbd {
   margin-bottom: 14px;
 }
 .section-intro h2,
-.local-section h2,
-.faq h2 {
+.local-section h2 {
   font-size: 34px;
   font-weight: 500;
   line-height: 1.17;
@@ -948,36 +947,17 @@ kbd {
   gap: 80px;
   align-items: center;
 }
-.install-section .eyebrow {
-  color: #a1a1a8;
-  margin-bottom: 18px;
-}
 .install-section h2 {
-  font-size: 40px;
-  line-height: 1.1;
+  font-size: 34px;
+  line-height: 1.15;
   font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
   margin: 0;
 }
-.install-grid > div > p:not(.eyebrow) {
+.install-grid > div > p {
   font-size: 14px;
   color: #a1a1a8;
-  line-height: 1.7;
-  max-width: 340px;
-}
-.install-grid > div > .access-note {
-  font-size: 12px;
-  margin-top: 24px;
-}
-.repo-link {
-  font-size: 13px;
-  display: inline-block;
-  margin-top: 4px;
-  padding-bottom: 3px;
-  border-bottom: 1px solid #fff4;
-}
-.repo-link span {
-  margin-left: 10px;
+  margin: 12px 0 0;
 }
 .install-card {
   border: 1px solid #ffffff1f;
@@ -995,15 +975,71 @@ kbd {
   color: #b0b0b7;
   border-bottom: 1px solid #ffffff12;
 }
-.install-card-heading button {
-  font-size: 10px;
-  border: 1px solid #ffffff20;
-  border-radius: 5px;
-  padding: 4px 8px;
-  color: #d8d8de;
+.install-tabs {
+  display: flex;
+  gap: 4px;
 }
-.install-card-heading button:hover {
+.install-tabs button {
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  color: #a1a1a8;
+}
+.install-tabs button[aria-selected="true"] {
+  color: #f2f2f4;
   background: #ffffff12;
+}
+.install-tabs button:hover {
+  color: #f2f2f4;
+}
+.install-panel {
+  min-height: 140px;
+}
+.install-panel[hidden],
+#copy-install[hidden] {
+  display: none;
+}
+#copy-install {
+  font-size: 11px;
+  padding: 4px 8px;
+  color: #b0b0b7;
+  border-radius: 4px;
+}
+#copy-install:hover {
+  background: #ffffff12;
+  color: #f2f2f4;
+}
+.install-download {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 24px 20px 0;
+}
+.install-version {
+  font-size: 12px;
+  color: #b0b0b7;
+}
+.install-platform,
+.install-unavailable {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a1a1a8;
+  margin: 0;
+  padding: 16px 20px;
+}
+.install-unavailable {
+  padding-top: 24px;
+}
+.install-guide {
+  padding: 14px 20px;
+  border-top: 1px solid #ffffff12;
+  color: #b0b0b7;
+  font-size: 12px;
+}
+.install-guide a:hover,
+.install-version:hover {
+  color: #f2f2f4;
 }
 pre {
   margin: 0;
@@ -1012,13 +1048,16 @@ pre {
   line-height: 2;
   overflow: auto;
 }
+.install-panel pre {
+  padding: 20px 20px 12px;
+}
 code {
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 .install-next {
   font-size: 11px;
-  padding: 14px 16px;
-  border-top: 1px solid #ffffff12;
+  padding: 4px 20px 16px;
+  margin: 0;
   color: #a1a1a8;
 }
 .install-next code {
@@ -1033,79 +1072,6 @@ code {
   padding: 0 16px 12px;
   color: #c1d8cc;
   font-size: 11px;
-}
-.requirements {
-  margin-top: 48px;
-  padding-top: 24px;
-  border-top: 1px solid #ffffff17;
-  font-size: 12px;
-  color: #a1a1a8;
-}
-.requirements > span {
-  color: #dddde2;
-  font-size: 11px;
-}
-.requirements > p {
-  margin: 8px 0 18px;
-}
-.requirements summary {
-  color: #d3d3d9;
-  font-size: 12px;
-}
-.requirements details {
-  max-width: 650px;
-}
-.requirements details p {
-  line-height: 1.8;
-  margin: 16px 0 8px;
-}
-.requirements details code {
-  display: block;
-  overflow-wrap: anywhere;
-  color: #e0e0e5;
-  font-size: 11px;
-}
-.faq {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 80px;
-  padding-top: 70px;
-  padding-bottom: 70px;
-}
-.faq h2 {
-  font-size: 25px;
-}
-.faq details {
-  border-bottom: 1px solid var(--line);
-  padding: 0 0 18px;
-  margin-bottom: 18px;
-}
-.faq details p {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 14px 0 0;
-}
-summary {
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-}
-summary::-webkit-details-marker {
-  display: none;
-}
-summary::after {
-  content: "+";
-  font-size: 18px;
-  font-weight: 400;
-}
-details[open] > summary::after {
-  content: "−";
 }
 .site-footer {
   display: flex;
@@ -1159,8 +1125,7 @@ details[open] > summary::after {
     display: none;
   }
   .section-intro,
-  .install-grid,
-  .faq {
+  .install-grid {
     gap: 40px;
   }
   .feature-grid {
@@ -1345,21 +1310,6 @@ details[open] > summary::after {
   .install-next code {
     display: inline;
     margin-left: 4px;
-  }
-  .requirements {
-    margin-top: 28px;
-  }
-  .requirements > p {
-    line-height: 1.9;
-  }
-  .faq {
-    display: block;
-    padding-top: 45px;
-    padding-bottom: 30px;
-  }
-  .faq h2 {
-    margin-bottom: 30px;
-    font-size: 24px;
   }
   .site-footer {
     flex-wrap: wrap;

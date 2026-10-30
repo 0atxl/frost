@@ -6,6 +6,7 @@ import { latestRelease, releaseHtml } from "../landing/release-data.mjs";
 
 const base = "https://github.com/0atxl/frost";
 const tag = "v0.1.0";
+const downloadSlot = "<!-- release-download:start -->Unavailable<!-- release-download:end -->";
 const hash = "a".repeat(64);
 const asset = (name: string) => ({ name, state: "uploaded", size: 100,
   browser_download_url: `${base}/releases/download/${tag}/${name}`,
@@ -26,9 +27,11 @@ test("landing embeds anonymous stable assets with verified checksums and no cred
   assert.equal(result.available, true);
   assert.equal(result.version, "0.1.0");
   assert.equal(result.assets[0].sha256, hash);
-  const html = releaseHtml('<a href="#install" data-release-button>Install from source</a><!-- release-status -->', result);
+  const html = releaseHtml(downloadSlot, result);
   assert(html.includes(`${base}/releases/download/${tag}/frost-0.1.0-linux-x64.tar.gz`));
-  assert(html.includes("SHA-256 checksums"));
+  assert(html.includes("Download Linux x64"));
+  assert(html.includes(`href="${base}/releases/tag/${tag}"`));
+  assert(html.includes(">v0.1.0</a>"));
 });
 test("landing refuses drafts, prereleases, private repositories, incomplete assets and bad hashes", async () => {
   for (const request of [
@@ -42,6 +45,6 @@ test("landing refuses drafts, prereleases, private repositories, incomplete asse
     assert.equal(result.available, false);
     assert.deepEqual(result.assets, []);
     assert(!JSON.stringify(result).includes("credential-must-not-appear"));
-    assert(releaseHtml('<!-- release-status -->', result).includes("No public binary download"));
+    assert(releaseHtml(downloadSlot, result).includes("No public binary download"));
   }
 });

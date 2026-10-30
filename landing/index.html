@@ -17,8 +17,8 @@
       type="font/woff2"
       crossorigin
     />
-    <link rel="stylesheet" href="./styles.css?v=preview-clear-1" />
-    <script src="./demo.js" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=install-tabs-1" />
+    <script src="./demo.js?v=install-tabs-1" defer></script>
     <script type="module" src="./page-vapour.js?v=preview-clear-1"></script>
     <script>
       window.va = window.va || function () {
@@ -120,7 +120,7 @@
             preview. Your files stay on your computer.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#install" data-release-button>Install from source</a
+            <a class="button primary" href="#install">Install Frost</a
             ><a class="button secondary" href="#demo"
               >Try the preview <span aria-hidden="true">↓</span></a
             >
@@ -344,118 +344,39 @@
         </div>
       </section>
 
-      <section
-        class="install-section"
-        id="install"
-        aria-labelledby="install-title"
-      >
+      <section class="install-section" id="install" aria-labelledby="install-title">
         <div class="wrap install-grid">
           <div>
-            <p class="eyebrow">Get started</p>
-            <h2 id="install-title">Open a window.<br />Find the file.</h2>
-            <p>Run Frost locally, then open it in your browser.</p>
-            <p class="access-note">
-              <!-- release-status -->
-            </p>
-            <a class="repo-link" href="https://github.com/0atxl/frost"
-              >Star on GitHub <span aria-hidden="true">↗</span></a
-            >
+            <h2 id="install-title">Install Frost</h2>
+            <p>For Linux.</p>
           </div>
           <div class="install-card">
             <div class="install-card-heading">
-              <span
-                ><a href="https://aur.archlinux.org/packages/frost"
-                  >Arch Linux · AUR ↗</a
-                ></span
-              ><button id="copy-install">Copy commands</button>
+              <div class="install-tabs" role="tablist" aria-label="Installation method">
+                <button id="install-arch-tab" role="tab" aria-selected="true"
+                  aria-controls="install-arch" tabindex="0">Arch Linux</button>
+                <button id="install-linux-tab" role="tab" aria-selected="false"
+                  aria-controls="install-linux" tabindex="-1">Other Linux</button>
+              </div>
+              <button id="copy-install">Copy</button>
             </div>
-            <pre><code id="install-commands">yay -S frost
+            <div id="install-arch" class="install-panel" role="tabpanel"
+              aria-labelledby="install-arch-tab" tabindex="0">
+              <pre><code id="install-commands">yay -S frost
 frost</code></pre>
-            <div class="install-next">
-              Then open <code>http://127.0.0.1:4317</code>
+              <p class="install-next">Open <code>localhost:4317</code></p>
+              <p class="copy-status" id="copy-status" aria-live="polite"></p>
             </div>
-            <p class="copy-status" id="copy-status" aria-live="polite"></p>
+            <div id="install-linux" class="install-panel" role="tabpanel"
+              aria-labelledby="install-linux-tab" tabindex="0" hidden>
+              <!-- release-download:start -->
+              <p class="install-unavailable">No public binary download is available right now.</p>
+              <!-- release-download:end -->
+            </div>
+            <div class="install-guide">
+              <a href="https://github.com/0atxl/frost/blob/main/docs/distribution.md">Installation guide &amp; requirements ↗</a>
+            </div>
           </div>
-        </div>
-        <div class="wrap requirements">
-          <span>Before you start</span>
-          <p>
-            Linux desktop · Python 3 with PyGObject · GIO/GVfs and user D-Bus.
-            The AUR package installs system dependencies. The Linux archive
-            includes Node.js; source installs need a supported Node.js ≥22.13.
-          </p>
-          <details>
-            <summary>Other Arch Linux installation options</summary>
-            <p>With paru:</p>
-            <pre><code>paru -S frost
-frost</code></pre>
-            <p>
-              Without an AUR helper, review the PKGBUILD and build as your normal user:
-            </p>
-            <pre><code>git clone https://aur.archlinux.org/frost.git
-cd frost
-makepkg -si
-frost</code></pre>
-          </details>
-          <details>
-            <summary>Install the Linux x64 archive</summary>
-            <!-- release-install -->
-          </details>
-          <details>
-            <summary>Install from source</summary>
-            <pre><code>git clone https://github.com/0atxl/frost.git
-cd frost
-npm ci
-npm run build
-npm start</code></pre>
-            <p>
-              Requires a supported Node.js release ≥22.13, npm, and the desktop
-              dependencies below.
-            </p>
-          </details>
-          <details>
-            <summary>Desktop dependencies and first launch</summary>
-            <p>On Ubuntu or Debian:</p>
-            <code
-              >sudo apt install python3-gi gir1.2-glib-2.0 gvfs
-              gvfs-backends</code
-            >
-            <p>On Arch Linux:</p>
-            <code>sudo pacman -S python python-gobject glib2 gvfs</code>
-            <p>
-              Run Frost as your normal desktop user. On first launch, create an
-              access key. Keep the process running while you use Frost. File
-              operations affect the files on your computer.
-            </p>
-          </details>
-        </div>
-      </section>
-
-      <section class="faq wrap" aria-labelledby="faq-title">
-        <h2 id="faq-title">A few practical details.</h2>
-        <div>
-          <details>
-            <summary>Does Frost upload my files?</summary>
-            <p>
-              No. The local service listens on your computer's loopback address.
-              Browsing, searching, and previews happen locally.
-            </p>
-          </details>
-          <details>
-            <summary>Can I use it on Windows or macOS?</summary>
-            <p>
-              The browser interface can be shared across platforms. The current
-              release uses Linux desktop integrations; Windows and macOS need
-              their own integrations before they are supported.
-            </p>
-          </details>
-          <details>
-            <summary>Does the access key encrypt my files?</summary>
-            <p>
-              No. It locks access through Frost. Your files and operating-system
-              permissions stay as they are.
-            </p>
-          </details>
         </div>
       </section>
     </main>
