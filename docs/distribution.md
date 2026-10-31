@@ -2,6 +2,21 @@
 
 Frost is MIT licensed. Third-party code keeps its own licenses. Binary archives include `LICENSE`, `runtime/LICENSE`, `THIRD_PARTY_NOTICES.json`, copied build dependency notices, the Inter font license, and the original production dependency licenses.
 
+## Linux through npm
+
+The package is prepared as `@0atxl/frost`; its first publication is pending. Once published, install with a user-owned npm prefix:
+
+```sh
+npm install --global @0atxl/frost
+frost
+```
+
+Requires Linux and a supported Node.js release satisfying `>=22.13`, with npm. The npm package includes the compiled frontend and backend, the `frost` launcher, Python desktop helper, and third-party license notices. npm installs production dependencies, including Sharp's optional native modules for your platform. Keep optional dependencies enabled. Supported platforms must also satisfy [Sharp's installation requirements](https://sharp.pixelplumbing.com/install/). The CI installation matrix covers Ubuntu 22.04 and 24.04 with Node 24, plus Ubuntu 24.04 with Node 22.13.
+
+Install the external desktop requirements below. Run from your graphical desktop session without sudo. Open `http://127.0.0.1:4317` and stop with Ctrl+C. `frost --help` and `frost --version` work without starting the service. The launcher resolves installed assets through npm's command symlink, serves the compiled UI regardless of the launch directory, and keeps state outside the package directory. It does not install an updater or start a background service.
+
+For the first manual publication and later OIDC releases, see [npm publishing](npm-publishing.md).
+
 ## Arch Linux through AUR
 
 The [frost AUR package](https://aur.archlinux.org/packages/frost) uses system Node, Python, PyGObject, GIO/GVfs and libvips. With an AUR helper:
@@ -67,14 +82,14 @@ Launch from your ordinary desktop session. Browser media support still depends o
 
 ## State and upgrades
 
-The launcher chooses state in this order:
+The npm launcher, source startup commands, and archive launcher choose state in this order:
 
 1. An explicit `FROST_DATA_DIR`, resolved against the directory from which you invoke Frost.
 2. An existing `.frost-data` in that directory.
 3. An existing `.frost-data` alongside the installed assets.
 4. `$XDG_DATA_HOME/frost`, or `$HOME/.local/share/frost` when XDG is unset.
 
-New state directories use a private umask. Nothing migrates, resets or deletes existing state. When switching from a source installation, point `FROST_DATA_DIR` at the existing absolute data path, especially if launching from a new directory. Keep the access-key hash, settings and legacy Trash together. The source `npm start` command retains its current working-directory default.
+New default state directories are private. Nothing migrates, resets or deletes existing state. When switching from a source installation, point `FROST_DATA_DIR` at the existing absolute data path, especially if launching from a new directory. Keep the access-key hash, settings and legacy Trash together. Existing `.frost-data` directories keep their contents and permissions. An invalid relative `XDG_DATA_HOME` produces an error instead of creating data in an arbitrary directory.
 
 Stop Frost before replacing its installation. Extract a new version into a separate directory, retain the same data path, then start the new launcher. No automatic update mechanism is installed. State, personal files and credentials never belong in `/usr/lib/frost` or a release archive.
 

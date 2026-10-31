@@ -1,0 +1,117 @@
+name: npm package
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Install Linux desktop requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y python3-gi gir1.2-glib-2.0 gvfs-daemons gvfs-backends dbus-x11
+      - run: npm ci --include=optional
+      - name: Test with isolated desktop data
+        run: bash scripts/ci/desktop-session.sh npm test
+      - run: npm run build
+      - name: Collect dependency and font licenses
+        run: |
+          node scripts/release/notices.mjs "$PWD"
+          cp landing/assets/INTER-LICENSE.txt notices/INTER-LICENSE.txt
+      - name: Pack and inspect the actual npm tarball
+        run: |
+          mkdir -p "$RUNNER_TEMP/npm-package" .frost-data/trash .agents
+          printf 'must not ship\n' > .env.npm-package-canary
+          printf 'must not ship\n' > .frost-data/access.json
+          printf 'must not ship\n' > .frost-data/trash/package-canary
+          printf 'must not ship\n' > .agents/package-canary
+          npm pack --json --pack-destination "$RUNNER_TEMP/npm-package" > "$RUNNER_TEMP/npm-package/pack.json"
+          node scripts/ci/inspect-npm.mjs "$RUNNER_TEMP/npm-package"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: npm-candidate-${{ github.sha }}
+          path: ${{ runner.temp }}/npm-package/
+          if-no-files-found: error
+          retention-days: 7
+
+  installation:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            node: "24"
+          - os: ubuntu-22.04
+            node: "24"
+          - os: ubuntu-24.04
+            node: "22.13.0"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: npm-candidate-${{ github.sha }}
+          path: ${{ runner.temp }}/npm-package
+      - name: Install desktop requirements
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y python3-gi gir1.2-glib-2.0 gvfs-daemons gvfs-backends dbus-x11
+      - name: Install the tarball into a clean global prefix and exercise frost
+        run: |
+          cd "$RUNNER_TEMP/npm-package"
+          sha256sum --check --strict SHA256SUMS
+          prefix=$(mktemp -d "$RUNNER_TEMP/frost-npm-install-XXXXXX")
+          cd "$RUNNER_TEMP"
+          unset NODE_PATH NODE_OPTIONS
+          npm install --global --prefix "$prefix" --omit=dev --include=optional --no-audit --no-fund "$RUNNER_TEMP/npm-package/frost-package.tgz"
+          bash "$GITHUB_WORKSPACE/scripts/ci/desktop-session.sh" node "$GITHUB_WORKSPACE/scripts/ci/smoke-npm.mjs" "$prefix"
+
+  verified:
+    needs: [build, installation]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: npm-candidate-${{ github.sha }}
+          path: package
+      - name: Recheck the verified bytes
+        working-directory: package
+        run: sha256sum --check --strict SHA256SUMS
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        id: artifact
+        with:
+          name: frost-npm-package-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Link the verified artifact
+        env:
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          echo "Verified npm package: $ARTIFACT_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Contains frost-package.tgz, SHA256SUMS, package-files.txt, pack.json, and BUILD-INFO.txt. No npm publication was performed.' >> "$GITHUB_STEP_SUMMARY"

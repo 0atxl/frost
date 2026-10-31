@@ -10,6 +10,23 @@ The toolbar shows clickable breadcrumbs. Click an ancestor to navigate, or click
 
 The standalone landing page is in `landing/`. It uses sample files for its interactive demo and runs independently of Frost's local file service.
 
+## Install from npm
+
+The package is prepared as `@0atxl/frost`; the first npm publication is pending. After it is published:
+
+```sh
+npm install --global @0atxl/frost
+frost
+```
+
+Use a user-owned npm prefix and run Frost without sudo. Open `http://127.0.0.1:4317` and keep the process running until Ctrl+C. `frost --help` lists environment settings and `frost --version` prints the installed version. Installation uses the compiled app and does not run a build.
+
+Requires Linux, Node.js `>=22.13`, Python 3 with PyGObject, GIO/GVfs, and your graphical desktop's session D-Bus. Install system dependencies as described below or in the [installation guide](docs/distribution.md). npm supplies JavaScript dependencies and Sharp's optional native dependencies, not the Linux desktop services.
+
+New installations store state in `$XDG_DATA_HOME/frost`, or `$HOME/.local/share/frost`. Existing `.frost-data` directories remain in use. When switching from a source installation in another directory, set `FROST_DATA_DIR` to its absolute path to retain the access key, settings, and legacy Trash.
+
+Maintainers can find the verified artifact and first-publish procedure in [npm publishing](docs/npm-publishing.md). Automatic npm publication remains disabled until explicitly enabled after npm setup.
+
 ## Run locally
 
 Requires Linux, a supported Node.js release satisfying `>=22.13`, npm, Python 3 with PyGObject, and a working GIO/GVfs desktop session. CI uses Node.js 24. Desktop integration uses the same user session as your system file manager. Start Frost as your normal user, not with sudo.
@@ -68,7 +85,8 @@ FROST_ROOT=/home/you/Documents FROST_START_PATH=/home/you/Documents npm start
 | ------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `FROST_ROOT`       | `/`                                    | Root of the permitted filesystem tree. Paths and symlink targets outside it are rejected.   |
 | `FROST_START_PATH` | Your home directory                    | Starting folder, unless the URL contains a path.                                            |
-| `FROST_DATA_DIR`   | `.frost-data` in the working directory | Access-key hash, settings, and earlier Frost Trash. Use the same directory across launches. |
+| `FROST_DATA_DIR`   | Existing `.frost-data`, otherwise `$XDG_DATA_HOME/frost` or `$HOME/.local/share/frost` | Access-key hash, settings, and earlier Frost Trash. Explicit relative paths resolve from the launch directory. |
+| `XDG_DATA_HOME`    | `$HOME/.local/share`                    | Absolute base path for new Frost state. |
 | `PORT`             | `4317`                                 | Production port. Development uses 4317 and 4318.                                            |
 
 ## App lock

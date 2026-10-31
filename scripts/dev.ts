@@ -1,13 +1,14 @@
 import { createServer as createViteServer } from "vite";
 import { realpath } from "node:fs/promises";
 import os from "node:os";
-import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { createApp } from "../server/app.js";
+import { resolveDataDir } from "../server/data-dir.js";
 
 const root = await realpath(process.env.FROST_ROOT || "/");
 const { server } = await createApp({
   root,
-  dataDir: path.resolve(process.env.FROST_DATA_DIR || ".frost-data"),
+  dataDir: await resolveDataDir(fileURLToPath(new URL("../", import.meta.url))),
   initialPath: process.env.FROST_START_PATH || os.homedir(),
   allowedPorts: [4317, 4318],
 });

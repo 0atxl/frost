@@ -1,8 +1,7 @@
 {
-  "name": "frost-file-manager",
+  "name": "@0atxl/frost",
   "version": "0.1.0",
   "license": "MIT",
-  "private": true,
   "type": "module",
   "engines": {
     "node": ">=22.13"
@@ -50,5 +49,43 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
+  },
+  "description": "A local browser file manager for Linux desktops",
+  "bin": {
+    "frost": "bin/frost.js"
+  },
+  "files": [
+    "bin/frost.js",
+    "build/server/*.js",
+    "build/server/*.py",
+    "build/shared/*.js",
+    "dist/",
+    "docs/distribution.md",
+    "docs/npm-publishing.md",
+    "notices/",
+    "THIRD_PARTY_NOTICES.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "os": [
+    "linux"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0atxl/frost.git"
+  },
+  "homepage": "https://getfrost.vercel.app",
+  "bugs": {
+    "url": "https://github.com/0atxl/frost/issues"
+  },
+  "keywords": [
+    "file-manager",
+    "linux",
+    "local",
+    "desktop"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

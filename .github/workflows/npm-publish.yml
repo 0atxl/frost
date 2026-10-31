@@ -1,0 +1,56 @@
+name: npm publish
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # Leave NPM_PUBLISH_ENABLED unset until the first manual publish and npm's
+  # trusted publisher configuration are complete. No npm token is used.
+  package:
+    if: vars.NPM_PUBLISH_ENABLED == 'true'
+    uses: ./.github/workflows/npm-package.yml
+
+  publish:
+    needs: package
+    if: vars.NPM_PUBLISH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: frost-npm-package-${{ github.sha }}
+          path: package
+      - name: Check tag, registry identity, and verified tarball
+        working-directory: package
+        run: |
+          sha256sum --check --strict SHA256SUMS
+          tar -xOzf frost-package.tgz package/package.json > metadata.json
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { execFileSync } from 'node:child_process';
+          const pkg = JSON.parse(readFileSync('metadata.json', 'utf8'));
+          assert.equal(pkg.name, '@0atxl/frost');
+          assert.match(pkg.version, /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/);
+          assert.equal(process.env.GITHUB_REF, `refs/tags/v${pkg.version}`);
+          const [major, minor, patch] = execFileSync('npm', ['--version'], {encoding: 'utf8'}).trim().split('.').map(Number);
+          assert(major > 11 || (major === 11 && (minor > 5 || (minor === 5 && patch >= 1))), 'npm >=11.5.1 is required for trusted publishing');
+          JS
+      - name: Publish the verified tarball using npm OIDC
+        working-directory: package
+        run: npm publish ./frost-package.tgz --access public --provenance --registry=https://registry.npmjs.org/
