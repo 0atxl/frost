@@ -17,7 +17,11 @@ async function walk(directory) {
         license: metadata.license ?? "See upstream license files",
         repository: metadata.repository ?? null,
       });
-    } else if (/^(licen[cs]e|notice|copying|copyright)([._-]|$)/i.test(entry.name)) {
+    } else if (
+      /^(licen[cs]e|notice|copying|copyright)([._-]|$)/i.test(entry.name) &&
+      // For example, Lucide's copyright.mjs icon is code, not a legal notice.
+      !/\.(?:[cm]?[jt]sx?|map|wasm|py|[ch]|css)$/i.test(entry.name)
+    ) {
       const target = path.join(destination, "notices", file);
       await mkdir(path.dirname(target), { recursive: true });
       await copyFile(file, target);
