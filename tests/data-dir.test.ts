@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { resolveDataDir } from "../server/data-dir.js";
@@ -32,6 +32,9 @@ test("data paths stay outside the installation and preserve legacy state in plac
     assert.equal(await readFile(path.join(legacy, "trash", "keep.txt"), "utf8"), "legacy Trash");
     await rm(legacy, { recursive: true });
     await writeFile(legacy, "not a directory");
+    await assert.rejects(resolveDataDir(install, {}, cwd, home), /not a directory/);
+    await rm(legacy);
+    await symlink(path.join(fixture, "missing legacy data"), legacy);
     await assert.rejects(resolveDataDir(install, {}, cwd, home), /not a directory/);
   } finally {
     await rm(fixture, { recursive: true, force: true });

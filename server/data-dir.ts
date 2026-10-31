@@ -1,6 +1,6 @@
 import path from "node:path";
 import os from "node:os";
-import { mkdir, stat } from "node:fs/promises";
+import { lstat, mkdir } from "node:fs/promises";
 
 // Reuse legacy state in place. Never copy, merge, reset, or remove it.
 export async function resolveDataDir(
@@ -15,7 +15,7 @@ export async function resolveDataDir(
     path.join(installation, ".frost-data"),
   ])) {
     try {
-      if (!(await stat(directory)).isDirectory()) {
+      if (!(await lstat(directory)).isDirectory()) {
         throw new Error(`Frost data path is not a directory: ${directory}`);
       }
       return directory;
